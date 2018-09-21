@@ -3,6 +3,7 @@
  */
 package com.modintro.restfulclient.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -68,6 +69,9 @@ public class Main {
         menuBar.add(fileMenu);
         menuBar.add(helpMenu);
         frame.setJMenuBar(menuBar);
+        
+        StatusBar statusBar = new StatusBar();
+        frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         
         // Add menu actions
         
