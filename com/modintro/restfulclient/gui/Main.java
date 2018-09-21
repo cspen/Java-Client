@@ -16,6 +16,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import com.modintro.restfulclient.model.TableModel;
 
@@ -51,23 +53,20 @@ public class Main {
         
         // Add menu bar
         JMenuBar menuBar = new JMenuBar();
+        NewAction newAct = new NewAction("New", "Create a new record", new Integer(KeyEvent.VK_N));
+        DeleteAction deleteAct = new DeleteAction("Delete", "Delete a record", new Integer(KeyEvent.VK_D));
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(newAct);        
+        fileMenu.add(deleteAct);
+               
+        JMenu helpMenu = new JMenu("Help");
         HowToAction howToAct = new HowToAction("How to...", "Help", new Integer(KeyEvent.VK_T));
-        JMenu newMenuItem = new JMenu("New");
-        newMenuItem.setMnemonic(KeyEvent.VK_N);
+        helpMenu.add(howToAct);
+        AboutAction aboutAct = new AboutAction("About", "", KeyEvent.VK_A);
+        helpMenu.add(aboutAct);
         
-        JMenu deleteMenuItem = new JMenu("Delete");
-        deleteMenuItem.setMnemonic(KeyEvent.VK_D);
-        
-        HowToAction howToAct = new HowToAction("How to...", "Help", new Integer(KeyEvent.VK_T));
-        JMenu helpMenuItem = new JMenu("Help");
-        JMenuItem howToMenuItem = new JMenuItem(howToAct);
-        helpMenuItem.add(howToMenuItem);
-        JMenuItem aboutMenuItem = new JMenuItem("About", KeyEvent.VK_A);
-        helpMenuItem.add(aboutMenuItem);
-        
-        menuBar.add(newMenuItem);
-        menuBar.add(deleteMenuItem);
-        menuBar.add(helpMenuItem);
+        menuBar.add(fileMenu);
+        menuBar.add(helpMenu);
         frame.setJMenuBar(menuBar);
         
         // Add menu actions
@@ -83,21 +82,10 @@ public class Main {
         // Add footer
         
         frame.setVisible(true);
-        frame.pack();
+        // frame.pack();
 	}
 	
-	static class HowToAction extends AbstractAction {
-		
-		public HowToAction(String text, String desc, int mnemonic) {
-			super(text);
-			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			frame.getContentPane().setBackground(Color.GREEN);
-		}
-	}
+	
 	
 	static class NewAction extends AbstractAction {
 		
@@ -122,6 +110,32 @@ public class Main {
 		
 		public void actionPerformed(ActionEvent e) {
 			frame.getContentPane().setBackground(Color.BLACK);
+		}
+	}
+	
+	static class HowToAction extends AbstractAction {
+		
+		public HowToAction(String text, String desc, int mnemonic) {
+			super(text);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			frame.getContentPane().setBackground(Color.GREEN);
+		}
+	}
+	
+	static class AboutAction extends AbstractAction {
+		
+		public AboutAction(String text, String desc, int mnemonic) {
+			super(text);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			frame.getContentPane().setBackground(Color.BLUE);
 		}
 	}
 }
