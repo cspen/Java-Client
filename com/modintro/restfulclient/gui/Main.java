@@ -5,10 +5,12 @@ package com.modintro.restfulclient.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.net.URI;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -73,15 +75,19 @@ public class Main {
         StatusBar statusBar = new StatusBar();
         frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         
-        // Add menu actions
-        
         // Add JTable
-        final JTable jTable = new JTable(new TableModel());
+        TableModel tmodel = null;
+        try {
+        	tmodel = new TableModel(xml);
+        } catch (Exception e) {
+        	System.out.println(e.getMessage());
+        }
+        final JTable jTable = new JTable(tmodel);
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
 		// jTable.getModel().addTableModelListener(this);		
 		JScrollPane scrollPane = new JScrollPane(jTable);		
-		// frame.add(scrollPane);
+		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
         // Add footer
         
@@ -139,7 +145,37 @@ public class Main {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
+			if (Desktop.isDesktopSupported()) {
+				try {
+					Desktop.getDesktop().browse(new URI("http://www.yahoo.com"));
+				} catch(Exception ex) {
+					System.out.println(ex.getMessage());
+				}
+			}
 			frame.getContentPane().setBackground(Color.BLUE);
 		}
 	}
+	
+	static String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
+			"<notes>" +
+			"<note>" + 
+	   		"<to>Tove</to>" +
+	   		"<from>Jani</from>" +
+	   		"<heading>Reminder</heading>" +
+	   		"<body>Don't forget me this weekend!</body>" +
+	   		"</note>" +
+	   		"<note>" + 
+	   		"<to>Gia</to>" +
+	   		"<from>Craig</from>" +
+	   		"<heading>Helpful Tip</heading>" +
+	   		"<body>Just swallow next time!</body>" +
+	   		"</note>" +
+	   		"<note>" + 
+	   		"<to>Bean</to>" +
+	   		"<from>Craig</from>" +
+	   		"<heading>Bad Dog Notice</heading>" +
+	   		"<body>Stop pooping on the floor!</body>" +
+	   		"</note>" +
+	   		"</notes>";
+
 }
