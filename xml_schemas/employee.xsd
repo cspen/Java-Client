@@ -1,0 +1,32 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:annotation>
+    		<xsd:documentation xml:lang="en">
+     			Department schema for Java-Client
+     			Copyright 2018 Modintro.com. All rights reserved.
+    		</xsd:documentation>
+  	</xsd:annotation>
+
+	<xsd:element name="Employees">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Employee" minoccourance="0" maxoccurance="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="EmployeeID" type="xsd:positiveInteger"/>
+							<xsd:element name="Last_Name" type="xsd:string"/>
+							<xsd:element name="First_Name" type="xsd:string"/>
+							<xsd:element name="Department" type="xsd:string"/>
+							<xsd:element name="Full_Time" type="xsd:boolean"/>
+							<xsd:element name="Hire_Date" type="xsd:date"/>
+							<xsd:element name="Salary" type="xsd:positiveInteger"/>
+							<xsd:element name="Etag" type="xsd:string"/>
+							<xsd:element name="Last_Modified" type="xsd:dateTime"/>
+						</xsd:sequence>
+					</xsd:complexType>					
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
+		
