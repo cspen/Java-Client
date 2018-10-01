@@ -10,20 +10,20 @@
 	<xsd:element name="Employees">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="Employee" minoccourance="0" maxoccurance="unbounded">
+				<xsd:element name="Employee" minOccurs="0" maxOccurs="unbounded">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="EmployeeID" type="xsd:positiveInteger"/>
-							<xsd:element name="Last_Name" type="xsd:string"/>
-							<xsd:element name="First_Name" type="xsd:string"/>
-							<xsd:element name="Department" type="xsd:string"/>
-							<xsd:element name="Full_Time" type="xsd:boolean"/>
-							<xsd:element name="Hire_Date" type="xsd:date"/>
-							<xsd:element name="Salary" type="xsd:positiveInteger"/>
-							<xsd:element name="Etag" type="xsd:string"/>
-							<xsd:element name="Last_Modified" type="xsd:dateTime"/>
+							<xsd:element name="employeeID" type="xsd:positiveInteger"/>
+							<xsd:element name="last_name" type="xsd:string"/>
+							<xsd:element name="first_name" type="xsd:string"/>
+							<xsd:element name="department" type="xsd:string"/>
+							<xsd:element name="full_time" type="xsd:boolean"/>
+							<xsd:element name="hire_date" type="xsd:date"/>
+							<xsd:element name="salary" type="xsd:positiveInteger"/>
+							<xsd:element name="etag" type="xsd:string"/>
+							<xsd:element name="last_modified" type="xsd:dateTime"/>
 						</xsd:sequence>
-					</xsd:complexType>					
+					</xsd:complexType>									
 				</xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>
