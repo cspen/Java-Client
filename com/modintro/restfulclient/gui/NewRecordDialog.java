@@ -27,38 +27,39 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		setSize(100, 100);
 		
 		JPanel form = new JPanel(new GridBagLayout());
+		
+		JLabel fnameLabel = new JLabel("First Name: ");
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.insets = new Insets(5, 5, 5, 5);
-		JLabel fnameLabel = new JLabel("First Name:");
+		c.insets = new Insets(5, 5, 5, 5);		
 		form.add(fnameLabel, c);
 		
+		fname = new JTextField();
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
 		c.gridy = 0;
 		c.weightx = 0.1;
 		c.insets = new Insets(5, 5, 5, 5);
-		JTextField fname = new JTextField();
 		form.add(fname, c);
 		
+		JLabel lnameLabel = new JLabel("Last Name: ");
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 1;
 		c.insets = new Insets(5, 5, 5, 5);
-		JLabel lnameLabel = new JLabel("Last Name:");
 		form.add(lnameLabel, c);
 		
+		lname = new JTextField();
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
 		c.gridy = 1;
 		c.weightx = 0.1;
 		c.insets = new Insets(5, 5, 5, 5);
-		JTextField lname = new JTextField();
 		form.add(lname, c);
 		
 		JLabel deptLabel = new JLabel("Department");
@@ -69,7 +70,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		c.insets = new Insets(5, 5, 5, 5);
 		form.add(deptLabel, c);		
 		
-		JComboBox deptCombo = createDeptCombo();
+		deptCombo = createDeptCombo();
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
@@ -77,16 +78,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		c.insets = new Insets(5, 5, 5, 5);
 		form.add(deptCombo, c);
 		
-		/*
-		JLabel ftLabel = new JLabel("Full Time: ");
-		c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 3;
-		c.insets = new Insets(5, 5, 5, 5);
-		form.add(ftLabel, c); */
-		
-		JCheckBox ftCheck = new JCheckBox("Full Time: ");
+		ftCheck = new JCheckBox("Full Time: ");
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
@@ -103,7 +95,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		form.add(hireDate, c);
 		
 		int year = Calendar.getInstance().get(Calendar.YEAR);
-		JComboBox<Integer> hireYear = createNumericCombo(1900, year, year);
+		hireYear = createNumericCombo(1900, year, year);
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
@@ -113,7 +105,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		form.add(hireYear, c);
 		
 		int month = Calendar.getInstance().get(Calendar.MONTH);
-		JComboBox<Integer> hireMonth = createNumericCombo(1, 12, month);
+		hireMonth = createNumericCombo(1, 12, month);
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 2;
@@ -123,7 +115,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		form.add(hireMonth, c);
 		
 		int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-		JComboBox<Integer> hireDay = createNumericCombo(1, 31, day);
+		hireDay = createNumericCombo(1, 31, day);
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 3;
@@ -145,11 +137,7 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		c.gridx = 1;
 		c.gridy = 5;
 		c.insets = new Insets(5, 5, 5, 5);
-		form.add(salary, c);
-		
-		
-		
-		
+		form.add(salary, c);		
 		
 		getContentPane().add(form, BorderLayout.CENTER);
 		
@@ -187,7 +175,17 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 		Object source = e.getSource();
 		if(source == ok) {
 			// TO-DO: Code to add new record
-			setVisible(false);
+			System.out.println("Last Name: " + lname.getText());
+			System.out.println("First Name: " + fname.getText());
+			System.out.println("Department: " + deptCombo.getSelectedItem());
+			System.out.println("Full Time: " + ftCheck.isSelected());
+			System.out.println("Hired Date: " + hireYear.getSelectedItem() + "-" +
+					hireMonth.getSelectedItem() + "-" + hireDay.getSelectedIndex());
+			System.out.println("Salary: " + salary.getText());
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			// setVisible(false);
 		} else if(source == cancel) {
 			// TO-DO: Clear all inputs
 			setVisible(false);
@@ -197,4 +195,13 @@ public class NewRecordDialog extends JDialog implements ActionListener {
 	private JFrame window;
 	private JButton ok;
 	private JButton cancel;
+	
+	private JTextField fname;
+	private JTextField lname;
+	private JComboBox deptCombo;
+	private JCheckBox ftCheck;
+	private JComboBox<Integer> hireYear;
+	private JComboBox<Integer> hireMonth;
+	private JComboBox<Integer> hireDay;
+	private JTextField salary;
 }
