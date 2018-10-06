@@ -43,38 +43,51 @@ public class HTTPRequest {
 	}
 	
 	public String getData() throws Exception {
-		return request("GET", null, null);
+		return request("GET", null);
 	}
-	
-	public String getData(int id) throws Exception {
-		return request("GET", id + "", null);
-	}
-	
+		
 	public String getData(int page, int pagesize) throws Exception {
 		String params = "?page=" + page + "&pagesize=" + pagesize;
-		return request("GET", params, null);
+		return request("GET", params);
 	}
 	
 	public String getData(int page, int pageSize,
 			String sortBy, Boolean sortOrder) throws Exception{
 		String params = "?page=" + page + "&pagesize=" + pageSize
 				+ "&sort=" + sortBy + "&order=" + sortOrder;
-		return request("GET", params, null);
+		return request("GET", params);
+	}	
+
+	public String getData(int id, String etag, String lastModified) throws Exception {
+		URL url = new URL(this.url + id);
+        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+        URLConn.setRequestMethod("GET");
+       	URLConn.setRequestProperty("Etag", etag);
+       	URLConn.setRequestProperty("Last-Modified", lastModified);
+		return urlResponseReader(URLConn);
 	}
 	
 	public String postData(String data) throws Exception {
 		URL url = new URL(this.url);
 		HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
 		URLConn.setDoOutput(true);
-        URLConn.setRequestMethod("PUT");
+        URLConn.setRequestMethod("POST");
         URLConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
     	
+        try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
+    		wr.write(data.getBytes());
+    	}
         
-		return request("POST", null, data);
+		return urlResponseReader(URLConn);
 	}
 	
-	public void deleteData(int id) throws Exception {
-		request("DELETE", id + "", null);
+	public void deleteData(int id, String etag, String lastModified) throws Exception {
+		URL url = new URL(this.url + id);
+        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+        URLConn.setRequestMethod("DELETE");
+       	URLConn.setRequestProperty("Etag", etag);
+       	URLConn.setRequestProperty("Last-Modified", lastModified);
+        
 	}
 	
 	public String putData(int id, String data, String etag, String lastModified) throws Exception {
@@ -90,10 +103,9 @@ public class HTTPRequest {
     		wr.write(data.getBytes());
     	}		
 		return urlResponseReader(URLConn);
-	}
+	}	
 	
-	
-	private String request(String httpVerb, String params, String data) throws Exception {
+	private String request(String httpVerb, String params) throws Exception {
 		URL url;
 		if(params != null) {
 			url = new URL(this.url + params);
@@ -102,26 +114,14 @@ public class HTTPRequest {
 		} 
         HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
         URLConn.setRequestMethod(httpVerb);
-        if(httpVerb.equals("POST") || httpVerb.equals("PUT")) {
-        	URLConn.setDoOutput(true);
-        	if(httpVerb.equals("POST")) {
-        		URLConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        	} else {
-        		URLConn.setRequestProperty("Content-Type", "application/json");
-        	}
-        	try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
-        		wr.write(data.getBytes());
-        	}
-        } else {
-        	URLConn.setRequestProperty("Accept", "application/xml");
-        }
+       	URLConn.setRequestProperty("Accept", "application/xml");
         
         return urlResponseReader(URLConn);
 	}     
         
     private String urlResponseReader(HttpURLConnection URLConn) throws Exception {
-    		BufferedReader in = new BufferedReader(
-        		new InputStreamReader(URLConn.getInputStream()));
+    	BufferedReader in = new BufferedReader(
+        	new InputStreamReader(URLConn.getInputStream()));
 
         String inputLine;
         StringBuilder input = new StringBuilder();
@@ -129,7 +129,23 @@ public class HTTPRequest {
             input.append(inputLine);
         in.close();
         return input.toString();
-	}	
+    }
+    
+    public String statusCode() {
+    	return this.statusCode;
+    }
+    
+    public String getMessage() {
+    	return this.statusMessage;
+    }
+    
+    public String etag() {
+    	return this.etag();
+    }
+    
+    public String lastModified() {
+    	return this.lastModified;
+    }
 	
 	private String url;
 	private String statusCode;
