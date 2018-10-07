@@ -16,28 +16,29 @@ import java.net.URL;
 
 public class HTTPRequest {
 	
-	/*
+	
 	public static void main(String[] args) {
 		try {
 			HTTPRequest reader = new HTTPRequest("http://localhost/GEM/rest/employees/");
 			// String data = "lname=Reys&fname=Bart";
 			// data += "&dept=Accounting&salary=20000&ftime=0&hdate=2018-12-31";
 			
-			String json = "{\"lastname\":\"Fudge\", \"firstname\":\"Elmer\"," +
+			String json = "{\"lastname\":\"Brida\", \"firstname\":\"Elmer\"," +
 					"\"department\":\"Sales\", \"fulltime\":\"0\", \"hiredate\":\"2018-09-02\"," +
 					"\"salary\":\"75000\" }";
-			String str = reader.putData(100, json);
-			System.out.print(str);
+			// String str = reader.putData(70, json, "7647966b7343c29048673252e", null);
+			String str = reader.getData(70, "ac627ab1ccbdb62ec96e702f07f6425b", "Sat, 03 Oct 2018 04:26:25 GMT");
+			System.out.print("END " + str);
 		} catch(Exception e) {
-			System.out.println("getMessage());
+			System.out.println("CHEERS : " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
-	*/
-
+	
 	public HTTPRequest(String url) {
 		this.url = url;
-		statusCode = null;
-		statusMessage = null;
+		responseCode = 0;
+		responseMessage = null;
 		etag = null;
 		lastModified = null;
 	}
@@ -62,8 +63,11 @@ public class HTTPRequest {
 		URL url = new URL(this.url + id);
         HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
         URLConn.setRequestMethod("GET");
-       	URLConn.setRequestProperty("Etag", etag);
-       	URLConn.setRequestProperty("Last-Modified", lastModified);
+        URLConn.setRequestProperty("Accept", "application/xml");
+        if(etag != null)
+        	URLConn.setRequestProperty("If-None-Match", etag);
+        if(lastModified != null)
+        	URLConn.setRequestProperty("If-Modified-Since", lastModified);
 		return urlResponseReader(URLConn);
 	}
 	
@@ -96,8 +100,10 @@ public class HTTPRequest {
 		URLConn.setDoOutput(true);
         URLConn.setRequestMethod("PUT");
         URLConn.setRequestProperty("Content-Type", "application/json");
-        URLConn.setRequestProperty("Etag", etag);
-        URLConn.setRequestProperty("Last-Modified", lastModified);
+        if(etag != null)
+        	URLConn.setRequestProperty("Etag", etag);
+        if(lastModified != null)
+        	URLConn.setRequestProperty("Last-Modified", lastModified);
     	
         try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
     		wr.write(data.getBytes());
@@ -120,23 +126,29 @@ public class HTTPRequest {
 	}     
         
     private String urlResponseReader(HttpURLConnection URLConn) throws Exception {
+    	this.responseCode = URLConn.getResponseCode();
+        System.out.println("RESPONSE : " + this.responseCode);
     	BufferedReader in = new BufferedReader(
         	new InputStreamReader(URLConn.getInputStream()));
-
-        String inputLine;
+    	
+    	String inputLine;
         StringBuilder input = new StringBuilder();
         while ((inputLine = in.readLine()) != null)
             input.append(inputLine);
         in.close();
+        
+        
+        System.out.println("Last-Modified : " + URLConn.getHeaderField("Last-Modified"));
+        
         return input.toString();
     }
     
-    public String statusCode() {
-    	return this.statusCode;
+    public int responseCode() {
+    	return this.responseCode;
     }
     
     public String getMessage() {
-    	return this.statusMessage;
+    	return this.responseMessage;
     }
     
     public String etag() {
@@ -148,8 +160,8 @@ public class HTTPRequest {
     }
 	
 	private String url;
-	private String statusCode;
-	private String statusMessage;
+	private int responseCode;
+	private String responseMessage;
 	private String etag;
 	private String lastModified;
 }
