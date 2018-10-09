@@ -27,7 +27,7 @@ public class HTTPRequest {
 					"\"department\":\"Sales\", \"fulltime\":\"0\", \"hiredate\":\"2018-09-02\"," +
 					"\"salary\":\"75000\" }";
 			// String str = reader.putData(70, json, "7647966b7343c29048673252e", null);
-			String str = reader.getData(70, "ac627ab1ccbdb62ec96e702f07f6425b", "Sat, 03 Oct 2018 04:26:25 GMT");
+			String str = reader.getData(70, "ac627ab1ccbdb62ec96e702f07f6425b", "Sat, 07 Oct 2018 04:26:25 GMT");
 			System.out.print("END " + str);
 		} catch(Exception e) {
 			System.out.println("CHEERS : " + e.getMessage());
@@ -64,10 +64,11 @@ public class HTTPRequest {
         HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
         URLConn.setRequestMethod("GET");
         URLConn.setRequestProperty("Accept", "application/xml");
-        if(etag != null)
+        // if(etag != null)
         	URLConn.setRequestProperty("If-None-Match", etag);
-        if(lastModified != null)
+        // if(lastModified != null)
         	URLConn.setRequestProperty("If-Modified-Since", lastModified);
+        URLConn.connect();
 		return urlResponseReader(URLConn);
 	}
 	
@@ -89,9 +90,8 @@ public class HTTPRequest {
 		URL url = new URL(this.url + id);
         HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
         URLConn.setRequestMethod("DELETE");
-       	URLConn.setRequestProperty("Etag", etag);
-       	URLConn.setRequestProperty("Last-Modified", lastModified);
-        
+       	URLConn.setRequestProperty("If-Match", etag);
+       	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);        
 	}
 	
 	public String putData(int id, String data, String etag, String lastModified) throws Exception {
@@ -101,9 +101,9 @@ public class HTTPRequest {
         URLConn.setRequestMethod("PUT");
         URLConn.setRequestProperty("Content-Type", "application/json");
         if(etag != null)
-        	URLConn.setRequestProperty("Etag", etag);
+        	URLConn.setRequestProperty("If-Matches", etag);
         if(lastModified != null)
-        	URLConn.setRequestProperty("Last-Modified", lastModified);
+        	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
     	
         try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
     		wr.write(data.getBytes());
@@ -139,7 +139,7 @@ public class HTTPRequest {
         
         
         System.out.println("Last-Modified : " + URLConn.getHeaderField("Last-Modified"));
-        
+        System.out.println(input.toString());
         return input.toString();
     }
     
