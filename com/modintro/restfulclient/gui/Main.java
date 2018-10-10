@@ -7,22 +7,31 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.URI;
+import java.net.URL;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
+import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
+import com.modintro.restfulclient.model.ServerResponseParser; 
 
 /**
  * @author Craig Spencer <craigspencer@modintro.com>
@@ -78,11 +87,31 @@ public class Main {
         // Add JTable
         TableModel tmodel = null;
         try {
-        	tmodel = new TableModel(xml);
+        	// URL theService = new URL("http://modintro.com/announcements/");
+        	HTTPRequest httpReq = new HTTPRequest("http://localhost/GEM/rest/employees/");
+        	String data = httpReq.getData();
+        	tmodel = new TableModel(data);
         } catch (Exception e) {
         	System.out.println(e.getMessage());
+        	String msg = "\nClosing Application";
+        	JOptionPane.showMessageDialog(frame, e.getMessage() + msg,
+        			"Error", JOptionPane.ERROR_MESSAGE);
+        	System.exit(0);
         }
+        
         final JTable jTable = new JTable(tmodel);
+        jTable.setRowSorter(new TableRowSorter(tmodel));
+        
+        JComboBox deptCombo = createDeptCombo();
+        TableColumn deptCol = jTable.getColumnModel().getColumn(3);
+        deptCol.setCellEditor(new DefaultCellEditor(deptCombo));
+        		
+        // Hide etag and last-modified columns
+        jTable.getColumnModel().getColumn(7).setMinWidth(0);
+        jTable.getColumnModel().getColumn(8).setMinWidth(0);
+        jTable.getColumnModel().getColumn(7).setMaxWidth(0);
+        jTable.getColumnModel().getColumn(8).setMaxWidth(0);
+        
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
 		// jTable.getModel().addTableModelListener(this);		
@@ -90,9 +119,32 @@ public class Main {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
         // Add footer
+		
+		// Add dialog boxes
+		newRecDialog = new NewRecordDialog(frame);
         
         frame.setVisible(true);
         // frame.pack();
+	}
+	
+	private static JComboBox createDeptCombo() {
+		JComboBox jcombo = new JComboBox();
+		try {
+			HTTPRequest httpReq = new HTTPRequest(DEPT_LIST_URL);
+			ServerResponseParser srp = new ServerResponseParser(httpReq.getData());
+			String[] data = srp.getColumnNames();			
+			System.out.println(data.length);
+			for(int i = 0; i < data.length; i++) {
+				// jcombo.addItem(data[i]);
+				System.out.println(data[i]);
+			}
+			
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			// ex.printStackTrace();
+		}
+		return jcombo;
+		
 	}
 	
 	
@@ -106,7 +158,12 @@ public class Main {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			frame.getContentPane().setBackground(Color.RED);
+			// frame.getContentPane().setBackground(Color.RED);
+			Rectangle bounds = frame.getBounds();
+			newRecDialog.setLocation(bounds.x + bounds.width/3,
+					bounds.y + bounds.height/3);
+			newRecDialog.setVisible(true);
+			
 		}
 	}
 	
@@ -144,6 +201,7 @@ public class Main {
 			putValue(MNEMONIC_KEY, mnemonic);
 		}
 		
+		// Open web page in human's default browser
 		public void actionPerformed(ActionEvent e) {
 			if (Desktop.isDesktopSupported()) {
 				try {
@@ -156,6 +214,8 @@ public class Main {
 		}
 	}
 	
+	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
+	private static NewRecordDialog newRecDialog;
 	static String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
 			"<notes>" +
 			"<note>" + 
