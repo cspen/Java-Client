@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,10 +35,11 @@ import test.jaxb.Employees;
 import test.jaxb.Employees.Employee;
 
 public class NewRecordDialog extends JDialog
-		implements ActionListener, Constants {
+		implements ActionListener, Constants, WindowListener {
 	
 	public NewRecordDialog(JFrame window) {
-		super(window, "New Record", true);		
+		super(window, "New Employee", true);
+		addWindowListener(this);
 		this.window = window;
 		setSize(100, 100);
 		
@@ -214,11 +217,26 @@ public class NewRecordDialog extends JDialog
 			Integer year = (Integer)hireYear.getSelectedItem();
 			Integer  month = (Integer)hireMonth.getSelectedItem();
 			Integer day = (Integer)hireDay.getSelectedItem();
-			String sal = salary.getText();	
+			String sal = salary.getText();				
 			
-			
-			if(validateNewEmployee(lastName, firstName, year, month, day, sal)) {	
-				HTTPRequest httpReq = new HTTPRequest(DEPT_URL);
+			if(validateNewEmployee(lastName, firstName, year, month, day, sal)) {
+				try {
+					HTTPRequest httpReq = new HTTPRequest(APP_URL);
+					String data = "lname=" + lastName + "&fname=" + firstName;
+					data += "&dept=" + department + "&salary=" + sal;
+					data += "&ftime=" + fullTime;
+					data += "&hdate=" + year + "-" + month + "-" + day;
+					String response = httpReq.postData(data);
+					if(httpReq.responseCode() == 201) {
+						// Alert human and update table
+						JOptionPane.showMessageDialog(this, "Success");
+					} else {
+						JOptionPane.showMessageDialog(this, "Fail");
+					}
+				} catch(Exception ex) {
+					JOptionPane.showMessageDialog(this, "BAD NEWS");
+				}	
+				// reset();
 				// setVisible(false);
 			}
 		} else if(source == cancel) {
@@ -232,25 +250,44 @@ public class NewRecordDialog extends JDialog
 		String regEx = "^[A-Za-z ]+$";
 		String errMsg = "";
 		if(!ln.matches(regEx)) {
-			errMsg += "Last name may contain only letters and spaces";
+			errMsg += "Last name must contain only letters and spaces";
 		}
 		if(!fn.matches(regEx)) {
-			errMsg += "\nFirst name my contain only letters and spaces";
+			errMsg += "\nFirst name must contain only letters and spaces";
 		}
-		if(validateDate(year, month, day)) {
+		if(!validateDate(year, month, day)) {
 			errMsg += "\nThe date is not valid";
 		}
-		// if()
-			
+		if(!pay.matches("^[0-9]+$") || pay.equals("")) {
+			errMsg += "\nSalary must be a numeric value";
+		}
+
 		if(!errMsg.equals("")) {
-			JOptionPane.showMessageDialog(this, errMsg);
+			JOptionPane.showMessageDialog(this, errMsg, "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}		
 		return true;
 	}
 	
 	private Boolean validateDate(Integer year, Integer month, Integer day) {
-		return true;
+		if(year.intValue() < 1900 || year.intValue() > Calendar.getInstance().get(Calendar.YEAR)) {
+			return false;
+		}
+		if(month.intValue() < 1 || month.intValue() > 12) {
+			return false;
+		}
+		
+		int[] daysInMonth = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	    // Adjust for leap years
+	    if(year.intValue() % 400 == 0 || (year.intValue() % 100 != 0 && year.intValue() % 4 == 0))
+	        daysInMonth[1] = 29;
+	    
+	    if(day < 1 || day > daysInMonth[month-1]) {
+	    	return false;
+	    }
+	    
+	    return true;
 	}
 	
 	private void reset() {
@@ -263,6 +300,17 @@ public class NewRecordDialog extends JDialog
 		hireMonth.setSelectedItem(Calendar.getInstance().get(Calendar.MONTH));
 		hireDay.setSelectedItem(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 	}
+	
+	// For WindowListener Interface
+	public void windowActivated(WindowEvent e) {}
+	public void windowClosing(WindowEvent e) {
+		reset();
+	}
+	public void windowClosed(WindowEvent e) {}
+	public void windowDeactivated(WindowEvent e) {}
+	public void windowDeiconified(WindowEvent e) {}
+	public void windowIconified(WindowEvent e) {}
+	public void windowOpened(WindowEvent e) {}
 	
 	private JFrame window;
 	private JButton ok;
