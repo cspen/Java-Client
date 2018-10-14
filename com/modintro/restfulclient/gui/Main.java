@@ -102,7 +102,7 @@ public class Main {
         final JTable jTable = new JTable(tmodel);
         jTable.setRowSorter(new TableRowSorter(tmodel));
         
-        JComboBox deptCombo = createDeptCombo();
+        JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
         TableColumn deptCol = jTable.getColumnModel().getColumn(3);
         deptCol.setCellEditor(new DefaultCellEditor(deptCombo));
         		
@@ -125,29 +125,7 @@ public class Main {
         
         frame.setVisible(true);
         // frame.pack();
-	}
-	
-	private static JComboBox createDeptCombo() {
-		JComboBox jcombo = new JComboBox();
-		try {
-			HTTPRequest httpReq = new HTTPRequest(DEPT_LIST_URL);
-			ServerResponseParser srp = new ServerResponseParser(httpReq.getData());
-			String[] data = srp.getColumnNames();			
-			System.out.println(data.length);
-			for(int i = 0; i < data.length; i++) {
-				// jcombo.addItem(data[i]);
-				System.out.println(data[i]);
-			}
-			
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-			// ex.printStackTrace();
-		}
-		return jcombo;
-		
-	}
-	
-	
+	}	
 	
 	static class NewAction extends AbstractAction {
 		
@@ -216,26 +194,4 @@ public class Main {
 	
 	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
 	private static NewRecordDialog newRecDialog;
-	static String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
-			"<notes>" +
-			"<note>" + 
-	   		"<to>Tove</to>" +
-	   		"<from>Jani</from>" +
-	   		"<heading>Reminder</heading>" +
-	   		"<body>Don't forget me this weekend!</body>" +
-	   		"</note>" +
-	   		"<note>" + 
-	   		"<to>Gia</to>" +
-	   		"<from>Craig</from>" +
-	   		"<heading>Helpful Tip</heading>" +
-	   		"<body>Just swallow next time!</body>" +
-	   		"</note>" +
-	   		"<note>" + 
-	   		"<to>Bean</to>" +
-	   		"<from>Craig</from>" +
-	   		"<heading>Bad Dog Notice</heading>" +
-	   		"<body>Stop pooping on the floor!</body>" +
-	   		"</note>" +
-	   		"</notes>";
-
 }
