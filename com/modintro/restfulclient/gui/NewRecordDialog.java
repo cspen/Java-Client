@@ -172,7 +172,7 @@ public class NewRecordDialog extends JDialog
 		return button;
 	}
 	
-	private static JComboBox<String> createDeptCombo() {		
+	public static JComboBox<String> createDeptCombo() {		
 		HTTPRequest httpReq = new HTTPRequest(DEPT_URL);
 		JComboBox<String> deptCombo = new JComboBox<String>();
 		String depts = null;
@@ -217,32 +217,38 @@ public class NewRecordDialog extends JDialog
 			Integer year = (Integer)hireYear.getSelectedItem();
 			Integer  month = (Integer)hireMonth.getSelectedItem();
 			Integer day = (Integer)hireDay.getSelectedItem();
-			String sal = salary.getText();				
+			String sal = salary.getText();	
 			
 			if(validateNewEmployee(lastName, firstName, year, month, day, sal)) {
+				int ft = 0;
+				if(fullTime) {
+					ft = 1;
+				}
 				try {
 					HTTPRequest httpReq = new HTTPRequest(APP_URL);
 					String data = "lname=" + lastName + "&fname=" + firstName;
 					data += "&dept=" + department + "&salary=" + sal;
-					data += "&ftime=" + fullTime;
+					data += "&ftime=" + ft;
 					data += "&hdate=" + year + "-" + month + "-" + day;
 					String response = httpReq.postData(data);
 					if(httpReq.responseCode() == 201) {
 						// Alert human and update table
 						JOptionPane.showMessageDialog(this, "Success");
+						// TO-DO: Add new row to table
+						// Need to call server again to get
+						// etag and last modified columns
 					} else {
-						JOptionPane.showMessageDialog(this, "Fail");
+						JOptionPane.showMessageDialog(this,
+								"The operation could not be completed");
 					}
 				} catch(Exception ex) {
 					JOptionPane.showMessageDialog(this, "BAD NEWS");
-				}	
-				// reset();
-				// setVisible(false);
+					ex.printStackTrace();
+				}
 			}
-		} else if(source == cancel) {
-			reset();
-			setVisible(false);
-		}
+		} 
+		reset();
+		setVisible(false);
 	}
 	
 	private Boolean validateNewEmployee(String ln, String fn,
