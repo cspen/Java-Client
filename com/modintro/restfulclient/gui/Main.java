@@ -26,9 +26,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import com.modintro.restfulclient.model.Constants;
 import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
 import com.modintro.restfulclient.model.ServerResponseParser; 
@@ -37,7 +39,7 @@ import com.modintro.restfulclient.model.ServerResponseParser;
  * @author Craig Spencer <craigspencer@modintro.com>
  * 
  */
-public class Main {
+public class Main implements Constants {
 
 	/**
 	 * @param args
@@ -85,12 +87,14 @@ public class Main {
         frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         
         // Add JTable
-        TableModel tmodel = null;
+        DefaultTableModel tmodel = null;
         try {
-        	// URL theService = new URL("http://modintro.com/announcements/");
-        	HTTPRequest httpReq = new HTTPRequest("http://localhost/GEM/rest/employees/");
+        	// URL theService = new URL(APP_URL);
+        	HTTPRequest httpReq = new HTTPRequest(APP_URL);
         	String data = httpReq.getData();
-        	tmodel = new TableModel(data);
+        	ServerResponseParser xmlp = new ServerResponseParser(data);
+        	
+        	tmodel = new DefaultTableModel(xmlp.getData(), xmlp.getColumnNames());
         } catch (Exception e) {
         	System.out.println(e.getMessage());
         	String msg = "\nClosing Application";
@@ -100,7 +104,7 @@ public class Main {
         }
         
         final JTable jTable = new JTable(tmodel);
-        jTable.setRowSorter(new TableRowSorter(tmodel));
+        jTable.setRowSorter(new TableRowSorter<DefaultTableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
         TableColumn deptCol = jTable.getColumnModel().getColumn(3);
