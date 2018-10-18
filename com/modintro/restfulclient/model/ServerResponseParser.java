@@ -1,5 +1,21 @@
 package com.modintro.restfulclient.model;
 
+/**
+ * This ServerResponseParser is specifically for parser
+ * an XML response from the server located at
+ * http://modintro.com/employees/
+ * 
+ * The XML from the server is parsed and its data
+ * is stored into two arrays to be passed to a 
+ * DefaulTableModel constructor for use in a JTable.
+ * A one dimensional array stores the XML tags as
+ * column headers and a two dimensional array holds
+ * the data.
+ * 
+ * @author Craig Spencer <craigspencer@modintro.com>
+ * Last modified: 10/17/2018
+ */
+
 import java.io.StringReader;
 import java.util.ArrayList;
 
@@ -20,20 +36,27 @@ public class ServerResponseParser {
 		 parseXML(xml);		
 	}
 	
-	public void parseXML(String xml) throws Exception {
+	private void parseXML(String xml) throws Exception {
 		Document doc = loadXMLFromString(xml);
 			
 		// Get column names
-		Node node = doc.getFirstChild();
+		Node node = doc.getFirstChild(); 
 		Node nextNode = node.getFirstChild().getFirstChild();
+		
 		ArrayList<String> list = new ArrayList<String>();
 		while(nextNode != null) {
 			StringBuffer nodeName = new StringBuffer(nextNode.getNodeName());
-			nodeName.setCharAt(0, Character.toUpperCase(nodeName.charAt(0)));
-			list.add(nodeName.toString());
+			if(!nodeName.toString().equals("#text")) {	
+				nodeName.setCharAt(0, Character.toUpperCase(nodeName.charAt(0)));
+				list.add(nodeName.toString());
+			} else {
+				if(nextNode.getNodeValue() != null && nextNode.getNodeValue().trim().length() > 0) {
+					list.add(nextNode.getNodeValue());
+				} 
+			}
 			nextNode = nextNode.getNextSibling();
 		}
-			
+		
 		// Move column names from list to array
 		int listSize = list.size();
 		columnNames = new String[listSize];
@@ -48,13 +71,15 @@ public class ServerResponseParser {
 			Node currentNode = nodelist.item(i);
 			if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
 				Node temp = currentNode.getFirstChild();
-				if(temp.getNodeType() == Node.TEXT_NODE)
-					list.add(temp.getNodeValue());
-					// System.out.println(temp.getNodeType() + " " + temp.getNodeValue());
+				if(temp.getNodeType() == Node.TEXT_NODE) {
+					if(temp.getNodeValue().trim().length() > 0)
+						list.add(temp.getNodeValue());
+				}
 			}
 		}
-			
-		// Move data to 2D array
+		
+		// Move data to 2D array, if necessary
+		if(columnNames.length == 0) return;
 		listSize = list.size()/columnNames.length;
 		int index = 0;
 		data = new Object[listSize][columnNames.length];
@@ -79,7 +104,7 @@ public class ServerResponseParser {
 		*/
 	}	   
 	
-	public Document loadXMLFromString(String xml) throws Exception
+	public static Document loadXMLFromString(String xml) throws Exception
 	{
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder builder = factory.newDocumentBuilder();
