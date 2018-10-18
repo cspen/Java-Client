@@ -13,7 +13,7 @@ package com.modintro.restfulclient.model;
  * the data.
  * 
  * @author Craig Spencer <craigspencer@modintro.com>
- * Last modified: 10/17/2018
+ * Last modified: 10/18/2018
  */
 
 import java.io.StringReader;
@@ -43,7 +43,7 @@ public class ServerResponseParser {
 		Node node = doc.getFirstChild(); 
 		Node nextNode = node.getFirstChild().getFirstChild();
 		
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<Object> list = new ArrayList<Object>();
 		while(nextNode != null) {
 			StringBuffer nodeName = new StringBuffer(nextNode.getNodeName());
 			if(!nodeName.toString().equals("#text")) {	
@@ -65,15 +65,28 @@ public class ServerResponseParser {
 		}
 			
 		// Get data
-		list = new ArrayList<String>();
+		list = new ArrayList<Object>();
 		NodeList nodelist = doc.getElementsByTagName("*");
 		for(int i = 0; i < nodelist.getLength(); i++) {
 			Node currentNode = nodelist.item(i);
 			if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
 				Node temp = currentNode.getFirstChild();
 				if(temp.getNodeType() == Node.TEXT_NODE) {
-					if(temp.getNodeValue().trim().length() > 0)
-						list.add(temp.getNodeValue());
+					if(temp.getNodeValue().trim().length() > 0) {
+						String val = temp.getNodeValue();
+						if(val.matches("^[0-9]+$")) { // is numeric?
+							if(val.equals("0")) {
+								list.add(new Boolean("false"));
+							} else if(val.equals("1") 
+									&& temp.getParentNode().getNodeName().equals("full_time")) {
+								list.add(new Boolean("true"));
+							} else {
+								list.add(new Integer(val));
+							}
+						} else {
+							list.add(temp.getNodeValue());
+						}
+					}
 				}
 			}
 		}
@@ -112,7 +125,7 @@ public class ServerResponseParser {
 	    return builder.parse(is);
 	}
 	
-	public String[] getColumnNames() {
+	public Object[] getColumnNames() {
 		return columnNames;
 	}
 	
@@ -120,6 +133,6 @@ public class ServerResponseParser {
 		return data;
 	}
 	
-	private String[] columnNames;
+	private Object[] columnNames;
 	private Object[][] data;
 }
