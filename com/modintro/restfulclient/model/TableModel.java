@@ -2,15 +2,12 @@ package com.modintro.restfulclient.model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Vector;
 
-import javax.swing.JComboBox;
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import test.jaxb.Departments;
 import test.jaxb.Employees;
 import test.jaxb.Employees.Employee;
 
@@ -50,7 +47,7 @@ public class TableModel extends AbstractTableModel implements Constants {
         setDataVector(convertToArrayList(dataList), convertToArrayList(columnIdentifiers));
     }
 	
-	public void setDataVector(ArrayList dataList, ArrayList columnIdentifiers) {
+	public void setDataVector(ArrayList<ArrayList<Object>> dataList, ArrayList<Object> columnIdentifiers) {
 		if(dataList != null) {
 			this.dataList = dataList;
 		} else {
@@ -60,7 +57,7 @@ public class TableModel extends AbstractTableModel implements Constants {
 		if(columnIdentifiers != null) {
 			this.columnIdentifiers = columnIdentifiers;
 		} else {
-			this.columnIdentifiers = new ArrayList<String>();
+			this.columnIdentifiers = new ArrayList<Object>();
 		}
        fireTableStructureChanged();
     }
@@ -74,13 +71,12 @@ public class TableModel extends AbstractTableModel implements Constants {
 	}
 	
 	public String getColumnName(int col) {
-		return columnIdentifiers.get(col);		
+		return (String)columnIdentifiers.get(col);		
 	}
 	
 	public Object getValueAt(int row, int col) {
-		ArrayList<ArrayList> rowList = (ArrayList)dataList.get(row);
+		ArrayList<Object> rowList = (ArrayList<Object>)dataList.get(row);
         return rowList.get(col);
-		// return data[row][col];
 	}
 	
 	public Class<?> getColumnClass(int c) {
@@ -128,12 +124,12 @@ public class TableModel extends AbstractTableModel implements Constants {
 		return a;
 	}
 	
-	protected ArrayList<ArrayList> convertToArrayList(Object[][] anArray) {
+	protected ArrayList<ArrayList<Object>> convertToArrayList(Object[][] anArray) {
 		if(anArray == null) {
 			return null;
 		}
 		
-		ArrayList<ArrayList> a = new ArrayList<ArrayList>(anArray.length);
+		ArrayList<ArrayList<Object>> a = new ArrayList<ArrayList<Object>>(anArray.length);
 		for(Object[] o : anArray) {
 			a.add(convertToArrayList(o));
 		}
@@ -142,5 +138,5 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 	private Object[][] data;
 	private ArrayList<ArrayList<Object>> dataList;
-	private ArrayList<String> columnIdentifiers;
+	private ArrayList<Object> columnIdentifiers;
 }
