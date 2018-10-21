@@ -1,65 +1,33 @@
 package com.modintro.restfulclient.model;
 
-import java.io.StringReader;
-import java.util.ArrayList;
+
+import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-
-import test.jaxb.Employees;
-import test.jaxb.Employees.Employee;
 
 public class TableModel extends AbstractTableModel implements Constants {
-
-	public TableModel(String xml) throws Exception {
-		// ServerResponseParser srp = new ServerResponseParser(xml);
-		
-		dataList = new ArrayList<ArrayList<Object>>();
-		
-		HTTPRequest httpReq = new HTTPRequest(DEPT_URL);
-		String rows = null;
-		try {
-			rows = httpReq.getData();
-			JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
-			Unmarshaller u = jbc.createUnmarshaller();
-			
-			Employees emp = (Employees)u.unmarshal(new StreamSource(new StringReader(rows)));
-		    ArrayList<Employee> list = (ArrayList<Employee>) emp.getEmployee();
-		    int length = list.size();
-		    for(int i = 0; i < length; i++) {
-		    	// dataTable.get(i).add(0, list.get)
-		    }		   			
-		} catch(Exception e) {
-			System.out.println(e.getMessage());	
-		}
-		
-		// columnIdentifiers = srp.getColumnNames();
-		// data = srp.getData();
-	}
 	
 	public TableModel(Object[][] data, Object[] columnNames) {
         setDataVector(data, columnNames);
     }
 	
 	public void setDataVector(Object[][] dataList, Object[] columnIdentifiers) {
-        setDataVector(convertToArrayList(dataList), convertToArrayList(columnIdentifiers));
+        setDataVector(convertToVector(dataList), convertToVector(columnIdentifiers));
     }
 	
-	public void setDataVector(ArrayList<ArrayList<Object>> dataList, ArrayList<Object> columnIdentifiers) {
+	public void setDataVector(Vector<Vector<Object>> dataList, Vector<Object> columnIdentifiers) {
 		if(dataList != null) {
 			this.dataList = dataList;
 		} else {
-			this.dataList = new ArrayList<ArrayList<Object>>();
+			this.dataList = new Vector<Vector<Object>>();
 		}
 		
 		if(columnIdentifiers != null) {
 			this.columnIdentifiers = columnIdentifiers;
 		} else {
-			this.columnIdentifiers = new ArrayList<Object>();
+			this.columnIdentifiers = new Vector<Object>();
 		}
-       fireTableStructureChanged();
+        // fireTableStructureChanged();
     }
 	
 	public int getColumnCount() {
@@ -67,16 +35,16 @@ public class TableModel extends AbstractTableModel implements Constants {
 	}
 	
 	public int getRowCount() {
-		return data.length;
+		return dataList.size();
 	}
 	
 	public String getColumnName(int col) {
-		return (String)columnIdentifiers.get(col);		
+		return columnIdentifiers.get(col).toString();		
 	}
 	
 	public Object getValueAt(int row, int col) {
-		ArrayList<Object> rowList = (ArrayList<Object>)dataList.get(row);
-        return rowList.get(col);
+		Vector<Object> rowList = (Vector<Object>)dataList.get(row);
+		return rowList.get(col);
 	}
 	
 	public Class<?> getColumnClass(int c) {
@@ -85,15 +53,16 @@ public class TableModel extends AbstractTableModel implements Constants {
 	
 	// Implement if table is editable
 	public boolean isCellEditable(int row, int col) {
-		if(col == 0 || col == 5 )
+		if(col == 0 || col == 5 ) {
 			return false;
+		}
 		return true;
 	}
 	
 	// Implement if table's data can change
 	public void setValueAt(Object value, int row, int col) {
-		data[row][col] = value;
-		dataList.get(row).add(col, (String)value);
+		Vector rowVector = (Vector)dataList.elementAt(row);
+        rowVector.setElementAt(value, col);
 		fireTableCellUpdated(row, col);
 	}
 	
@@ -103,40 +72,39 @@ public class TableModel extends AbstractTableModel implements Constants {
     }
 	
 	public void insertRow(int row, Object[] rowData) {
-        insertRow(row, convertToArrayList(rowData));
+        insertRow(row, convertToVector(rowData));
     }
 	
-	public void insertRow(int row, ArrayList<Object> rowData) {
+	public void insertRow(int row, Vector<Object> rowData) {
         dataList.add(row, rowData);
         fireTableRowsInserted(row, row);
     }
 	
 	// Protected methods
-	protected ArrayList<Object> convertToArrayList(Object[] anArray) {
+	protected Vector<Object> convertToVector(Object[] anArray) {
 		if(anArray == null) {
 			return null;
 		}
 		
-		ArrayList<Object> a = new ArrayList<Object>(anArray.length);
+		Vector<Object> a = new Vector<Object>(anArray.length);
 		for(Object o : anArray ) {
 			a.add(o);
 		}
 		return a;
 	}
 	
-	protected ArrayList<ArrayList<Object>> convertToArrayList(Object[][] anArray) {
+	protected Vector<Vector<Object>> convertToVector(Object[][] anArray) {
 		if(anArray == null) {
 			return null;
 		}
 		
-		ArrayList<ArrayList<Object>> a = new ArrayList<ArrayList<Object>>(anArray.length);
+		Vector<Vector<Object>> a = new Vector<Vector<Object>>(anArray.length);
 		for(Object[] o : anArray) {
-			a.add(convertToArrayList(o));
+			a.add(convertToVector(o));
 		}
 		return a;
 	}
 		
-	private Object[][] data;
-	private ArrayList<ArrayList<Object>> dataList;
-	private ArrayList<Object> columnIdentifiers;
+	private Vector<Vector<Object>> dataList;
+	private Vector<Object> columnIdentifiers;
 }
