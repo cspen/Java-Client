@@ -26,6 +26,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -87,14 +89,15 @@ public class Main implements Constants {
         frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         
         // Add JTable
-        DefaultTableModel tmodel = null;
+        TableModel tmodel = null;
         try {
         	// URL theService = new URL(APP_URL);
         	HTTPRequest httpReq = new HTTPRequest(APP_URL);
         	String data = httpReq.getData();
         	ServerResponseParser xmlp = new ServerResponseParser(data);
         	
-        	tmodel = new DefaultTableModel(xmlp.getData(), xmlp.getColumnNames());
+        	tmodel = new TableModel(xmlp.getData(), xmlp.getColumnNames());
+        	
         } catch (Exception e) {
         	System.out.println(e.getMessage());
         	String msg = "\nClosing Application";
@@ -104,7 +107,8 @@ public class Main implements Constants {
         }
         
         final JTable jTable = new JTable(tmodel);
-        jTable.setRowSorter(new TableRowSorter<DefaultTableModel>(tmodel));
+        tmodel.addTableModelListener(new TableListener());
+        jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
         TableColumn deptCol = jTable.getColumnModel().getColumn(3);
@@ -130,6 +134,22 @@ public class Main implements Constants {
         frame.setVisible(true);
         // frame.pack();
 	}	
+	
+	static class TableListener implements TableModelListener {
+	
+		// Methods for TableModelInterface
+		public void tableChanged(TableModelEvent te) {
+			int row = te.getFirstRow();
+			int column = te.getColumn();
+			TableModel model = (TableModel)te.getSource();
+			String columnName = model.getColumnName(column);
+			Object data = model.getValueAt(row, column);
+			
+			JOptionPane.showMessageDialog(frame, "It's Alive!");
+
+			// Do something with the data...
+		}
+	}
 	
 	static class NewAction extends AbstractAction {
 		
