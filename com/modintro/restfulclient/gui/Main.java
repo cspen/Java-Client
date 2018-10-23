@@ -10,7 +10,12 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.net.URL;
 
@@ -54,7 +59,7 @@ public class Main implements Constants {
 	        });
 	}
 	
-	private static JFrame frame = new JFrame("Restful Client Demo");
+	
 	
 	private static void createAndShowGUI() {
 		//Create and set up the window.
@@ -106,11 +111,13 @@ public class Main implements Constants {
         	System.exit(0);
         }
         
-        final JTable jTable = new JTable(tmodel);
+        jTable = new JTable(tmodel);
         tmodel.addTableModelListener(new TableListener());
+        jTable.addMouseListener(new MouseInput());
         jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
+        deptCombo.addItemListener(new ComboListener());
         TableColumn deptCol = jTable.getColumnModel().getColumn(3);
         deptCol.setCellEditor(new DefaultCellEditor(deptCombo));
         		
@@ -138,6 +145,7 @@ public class Main implements Constants {
 	static class TableListener implements TableModelListener {
 	
 		// Methods for TableModelInterface
+		@Override
 		public void tableChanged(TableModelEvent te) {
 			int row = te.getFirstRow();
 			int column = te.getColumn();
@@ -145,9 +153,29 @@ public class Main implements Constants {
 			String columnName = model.getColumnName(column);
 			Object data = model.getValueAt(row, column);
 			
-			JOptionPane.showMessageDialog(frame, "It's Alive!");
+			// JOptionPane.showMessageDialog(frame, "It's Alive!");
 
 			// Do something with the data...
+		}
+	}
+	
+	static class MouseInput extends MouseAdapter {
+	    @Override
+	    public void mouseClicked(MouseEvent evt) {
+	        int row = jTable.rowAtPoint(evt.getPoint());
+	        int col = jTable.columnAtPoint(evt.getPoint());
+	        if (row >= 0 && col >= 0) {
+	           System.out.println("R: " + row + " C: " + col);
+	           System.out.println("VAL: " + jTable.getValueAt(row, col));
+
+	        }
+	    }
+	}
+	
+	static class ComboListener implements ItemListener {
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			System.out.println("I: " + e.getItem() + " P:" + e.paramString());
 		}
 	}
 	
@@ -216,6 +244,9 @@ public class Main implements Constants {
 		}
 	}
 	
+	private static JFrame frame = new JFrame("Restful Client Demo");
 	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
 	private static NewRecordDialog newRecDialog;
+	private static JTable jTable;
+	 
 }
