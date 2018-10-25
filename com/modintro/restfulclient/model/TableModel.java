@@ -27,7 +27,7 @@ public class TableModel extends AbstractTableModel implements Constants {
 		} else {
 			this.columnIdentifiers = new Vector<Object>();
 		}
-        // fireTableStructureChanged();
+        fireTableStructureChanged();
     }
 	
 	public int getColumnCount() {
@@ -61,9 +61,14 @@ public class TableModel extends AbstractTableModel implements Constants {
 	
 	// Implement if table's data can change
 	public void setValueAt(Object value, int row, int col) {
-		Vector rowVector = (Vector)dataList.elementAt(row);
-        rowVector.setElementAt(value, col);
-		fireTableCellUpdated(row, col);
+		Vector<Object> rowVector = (Vector<Object>)dataList.elementAt(row);
+		Object obj = rowVector.get(col);
+		
+		// Prevent unnecessary updates - conserve bandwidth
+		if(!value.equals(obj)) {
+			rowVector.setElementAt(value, col);
+			fireTableCellUpdated(row, col);
+		}
 	}
 	
 	public void removeRow(int row) {
