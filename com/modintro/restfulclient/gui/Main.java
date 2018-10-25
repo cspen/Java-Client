@@ -117,7 +117,6 @@ public class Main implements Constants {
         jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
-        deptCombo.addItemListener(new ComboListener());
         TableColumn deptCol = jTable.getColumnModel().getColumn(3);
         deptCol.setCellEditor(new DefaultCellEditor(deptCombo));
         		
@@ -154,11 +153,22 @@ public class Main implements Constants {
 			Object data = model.getValueAt(row, column);
 			
 			if(!data.equals(currentVal) && data != null ) {
+				if(data instanceof String) {
+					String temp = (String)data;
+					if(!temp.equals("")) {
+						// System.out.println("NOT AN EMPTY STRING");
+						// currentVal = null;
+						// Validate and update server
+					}
+				} else if(data instanceof Boolean) {
+					// System.out.println("CHECKBOX CLICKED");
+					// currentVal = null;
+				} else if(column == 3) {
+					// System.out.println("COMBOBOX CLICKED");
+					// currentVal = null;
+				}
 				System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
 			}
-			// JOptionPane.showMessageDialog(frame, "It's Alive!");
-
-			// Do something with the data...
 		}
 	}
 	
@@ -170,21 +180,11 @@ public class Main implements Constants {
 	        if (row >= 0 && col >= 0) {
 	        	if(col != 4) {
 	        		System.out.println("R: " + row + " C: " + col);
-	        		System.out.println("DATASELECTED: " + jTable.getValueAt(row, col) + "\n");
-	        		currentVal = jTable.getValueAt(row, col);
+	        		// System.out.println("DATASELECTED: " + jTable.getValueAt(row, col) + "\n");
+	        		// currentVal = jTable.getValueAt(row, col);
 	        	}
 	        }
 	    }
-	}
-	
-	static class ComboListener implements ItemListener {
-		@Override
-		public void itemStateChanged(ItemEvent e) {
-			if(e.getStateChange() == ItemEvent.SELECTED)
-			System.out.println("COMBOBOX I: " + e.getItem() + " P:" + e.getID());
-			System.out.println("");
-			currentVal = e.getItem();
-		}
 	}
 	
 	static class NewAction extends AbstractAction {
