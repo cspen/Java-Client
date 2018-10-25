@@ -113,7 +113,6 @@ public class Main implements Constants {
         
         jTable = new JTable(tmodel);
         tmodel.addTableModelListener(new TableListener());
-        jTable.addMouseListener(new MouseInput());
         jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
@@ -128,11 +127,8 @@ public class Main implements Constants {
         
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
-		// jTable.getModel().addTableModelListener(this);		
 		JScrollPane scrollPane = new JScrollPane(jTable);		
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-		
-        // Add footer
 		
 		// Add dialog boxes
 		newRecDialog = new NewRecordDialog(frame);
@@ -170,21 +166,6 @@ public class Main implements Constants {
 				System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
 			}
 		}
-	}
-	
-	static class MouseInput extends MouseAdapter {
-	    @Override
-	    public void mouseClicked(MouseEvent evt) {
-	        int row = jTable.rowAtPoint(evt.getPoint());
-	        int col = jTable.columnAtPoint(evt.getPoint());
-	        if (row >= 0 && col >= 0) {
-	        	if(col != 4) {
-	        		System.out.println("R: " + row + " C: " + col);
-	        		// System.out.println("DATASELECTED: " + jTable.getValueAt(row, col) + "\n");
-	        		// currentVal = jTable.getValueAt(row, col);
-	        	}
-	        }
-	    }
 	}
 	
 	static class NewAction extends AbstractAction {
