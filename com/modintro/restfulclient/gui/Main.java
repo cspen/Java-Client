@@ -18,6 +18,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.net.URL;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
@@ -29,12 +32,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import com.modintro.restfulclient.model.Constants;
@@ -102,6 +108,7 @@ public class Main implements Constants {
         	ServerResponseParser xmlp = new ServerResponseParser(data);
         	
         	tmodel = new TableModel(xmlp.getData(), xmlp.getColumnNames());
+        	tmodel.setHTTPRequest(httpReq);
         	
         } catch (Exception e) {
         	System.out.println(e.getMessage());
@@ -116,8 +123,17 @@ public class Main implements Constants {
         jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
         JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
-        TableColumn deptCol = jTable.getColumnModel().getColumn(3);
-        deptCol.setCellEditor(new DefaultCellEditor(deptCombo));
+        TableColumnModel colModel = jTable.getColumnModel();
+        
+        // Set combo box for department column
+        colModel.getColumn(3).setCellEditor(new DefaultCellEditor(deptCombo));
+        
+        // Set formatting for salary column
+        colModel.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+        
+        // Set formatting for text columns
+        colModel.getColumn(1).setCellRenderer(new TextRenderer());
+        colModel.getColumn(2).setCellRenderer(new TextRenderer());        
         		
         // Hide etag and last-modified columns
         jTable.getColumnModel().getColumn(7).setMinWidth(0);
@@ -148,23 +164,7 @@ public class Main implements Constants {
 			String columnName = model.getColumnName(column);
 			Object data = model.getValueAt(row, column);
 			
-			if(!data.equals(currentVal) && data != null ) {
-				if(data instanceof String) {
-					String temp = (String)data;
-					if(!temp.equals("")) {
-						// System.out.println("NOT AN EMPTY STRING");
-						// currentVal = null;
-						// Validate and update server
-					}
-				} else if(data instanceof Boolean) {
-					// System.out.println("CHECKBOX CLICKED");
-					// currentVal = null;
-				} else if(column == 3) {
-					// System.out.println("COMBOBOX CLICKED");
-					// currentVal = null;
-				}
-				System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
-			}
+			System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
 		}
 	}
 	
@@ -195,7 +195,33 @@ public class Main implements Constants {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			frame.getContentPane().setBackground(Color.BLACK);
+			int n = JOptionPane.showConfirmDialog(frame,
+					"Are you sure you want to delete the current row?",
+					"Delete row",
+					JOptionPane.YES_NO_OPTION); 
+			
+			if(n == 0) {
+				// Delete the row
+				
+				int row = jTable.getSelectedRow();
+				if(row == -1) {
+					JOptionPane.showMessageDialog(frame,
+					    "No row selected",
+					    "Message",
+					    JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+				
+				try {
+					System.out.println("DELETE ROW " + row);
+					
+				} catch(Exception ex) {
+					JOptionPane.showMessageDialog(frame,
+						    "The operation could not be completed",
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 	
@@ -233,10 +259,54 @@ public class Main implements Constants {
 		}
 	}
 	
+	public static class TextRenderer extends DefaultTableCellRenderer {
+		@Override
+		public void setValue(Object value) { 
+			//  Format the Object before setting its value in the renderer
+			try {
+				if (value != null && value instanceof String) {
+					String v = (String)value;System.out.println("sHERE");
+					if(!v.matches("^[A-Za-z]+$")) {
+						throw new IllegalArgumentException();
+					}
+				} 
+			}
+			catch(IllegalArgumentException e) {}
+			super.setValue(value);
+		}
+	}
+	
+	public static class NumberRenderer extends DefaultTableCellRenderer {
+		private Format formatter;
+		/*
+		 *  Use the specified number formatter and right align the text
+		 */
+		public NumberRenderer(NumberFormat formatter) {
+			this.formatter = formatter;
+			setHorizontalAlignment( SwingConstants.RIGHT );
+		}
+
+		/*
+		 *  Use the default currency formatter for the default locale
+		 */
+		public static NumberRenderer getCurrencyRenderer() {
+			return new NumberRenderer( NumberFormat.getCurrencyInstance() );
+		}
+		
+		@Override
+		public void setValue(Object value) {
+			//  Format the Object before setting its value in the renderer
+			try {
+				if (value != null)
+					value = formatter.format(value);
+			}
+			catch(IllegalArgumentException e) {}
+			super.setValue(value);
+		}
+	}
+	
 	private static JFrame frame = new JFrame("Restful Client Demo");
 	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
 	private static NewRecordDialog newRecDialog;
-	private static JTable jTable;
-	private static Object currentVal = null;
-	 
+	private static JTable jTable;	 
 }
