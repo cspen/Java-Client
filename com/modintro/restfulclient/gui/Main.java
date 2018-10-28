@@ -5,6 +5,7 @@ package com.modintro.restfulclient.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -24,7 +25,10 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
+import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -32,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -132,8 +137,9 @@ public class Main implements Constants {
         colModel.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
         
         // Set formatting for text columns
-        colModel.getColumn(1).setCellRenderer(new TextRenderer());
-        colModel.getColumn(2).setCellRenderer(new TextRenderer());        
+       // JTextField textField = new JTextField();
+        colModel.getColumn(1).setCellEditor(new TextVerifier());
+        colModel.getColumn(2).setCellEditor(new TextVerifier());     
         		
         // Hide etag and last-modified columns
         jTable.getColumnModel().getColumn(7).setMinWidth(0);
@@ -259,21 +265,42 @@ public class Main implements Constants {
 		}
 	}
 	
-	public static class TextRenderer extends DefaultTableCellRenderer {
-		@Override
-		public void setValue(Object value) { 
-			//  Format the Object before setting its value in the renderer
-			try {
-				if (value != null && value instanceof String) {
-					String v = (String)value;System.out.println("sHERE");
-					if(!v.matches("^[A-Za-z]+$")) {
-						throw new IllegalArgumentException();
-					}
-				} 
-			}
-			catch(IllegalArgumentException e) {}
-			super.setValue(value);
+	public static class TextVerifier extends DefaultCellEditor {
+		JFormattedTextField tf;
+		
+		public TextVerifier() {
+			super(new JFormattedTextField());
+			tf = (JFormattedTextField)getComponent();			
 		}
+		
+		@Override
+		public Component getTableCellEditorComponent(JTable table,
+	            Object value, boolean isSelected,
+	            int row, int column) {
+			JFormattedTextField ftf =
+		            (JFormattedTextField)super.getTableCellEditorComponent(
+		                table, value, isSelected, row, column);
+		        ftf.setValue(value);
+		        return ftf;
+		}		
+		
+		@Override
+		public boolean stopCellEditing() {
+	        JFormattedTextField ftf = (JFormattedTextField)getComponent();
+	        String s = (String)ftf.getValue();
+	        if (s.matches("^[A-Za-z]+ ?[A-Za-z]*$")) {
+	        	System.out.println("FAT CITY");
+	            try {
+	                ftf.commitEdit();
+	            } catch (java.text.ParseException exc) { }
+		    
+	        } else { //text is invalid
+	            return false; //don't let the editor go away
+		    } 
+	        return super.stopCellEditing();
+	    }
+
+		
 	}
 	
 	public static class NumberRenderer extends DefaultTableCellRenderer {
