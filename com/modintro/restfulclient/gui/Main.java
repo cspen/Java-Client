@@ -74,7 +74,6 @@ public class Main implements Constants {
 	
 	private static void createAndShowGUI() {
 		//Create and set up the window.
-        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Center the window
@@ -105,10 +104,9 @@ public class Main implements Constants {
         frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         
         // Add JTable
-        TableModel tmodel = null;
         try {
         	// URL theService = new URL(APP_URL);
-        	HTTPRequest httpReq = new HTTPRequest(APP_URL);
+        	httpReq = new HTTPRequest(APP_URL);
         	String data = httpReq.getData();
         	ServerResponseParser xmlp = new ServerResponseParser(data);
         	
@@ -137,7 +135,6 @@ public class Main implements Constants {
         colModel.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
         
         // Set formatting for text columns
-       // JTextField textField = new JTextField();
         colModel.getColumn(1).setCellEditor(new TextVerifier());
         colModel.getColumn(2).setCellEditor(new TextVerifier());     
         		
@@ -166,11 +163,23 @@ public class Main implements Constants {
 		public void tableChanged(TableModelEvent te) {
 			int row = te.getFirstRow();
 			int column = te.getColumn();
-			TableModel model = (TableModel)te.getSource();
-			String columnName = model.getColumnName(column);
-			Object data = model.getValueAt(row, column);
+			int type = te.getType();
 			
-			System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
+			String msg = "";
+			if(type == TableModelEvent.DELETE) {
+				msg = "DELETE ROW " + row;
+			} else if(type == TableModelEvent.INSERT) {
+				msg = "INSERT NEW ROW";
+			} else if(type == TableModelEvent.UPDATE) {
+				msg = "UPDATE ROW " + row;
+			}			
+			System.out.println(msg);
+			
+			// TableModel model = (TableModel)te.getSource();
+			// String columnName = model.getColumnName(column);
+			// Object data = model.getValueAt(row, column);
+			
+			// System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
 		}
 	}
 	
@@ -187,8 +196,7 @@ public class Main implements Constants {
 			Rectangle bounds = frame.getBounds();
 			newRecDialog.setLocation(bounds.x + bounds.width/3,
 					bounds.y + bounds.height/3);
-			newRecDialog.setVisible(true);
-			
+			newRecDialog.setVisible(true);			
 		}
 	}
 	
@@ -207,8 +215,7 @@ public class Main implements Constants {
 					JOptionPane.YES_NO_OPTION); 
 			
 			if(n == 0) {
-				// Delete the row
-				
+				// Delete the row				
 				int row = jTable.getSelectedRow();
 				if(row == -1) {
 					JOptionPane.showMessageDialog(frame,
@@ -219,14 +226,29 @@ public class Main implements Constants {
 				}
 				
 				try {
+					// Get data from table
+					// Need EmployeeID, etag, and lastModified
+					Integer id = (Integer)tmodel.getValueAt(row, 0);
+					String etag = (String)tmodel.getValueAt(row, 7);
+					String lastMod = (String)tmodel.getValueAt(row, 8);
+					
+					// Send request to server
+					httpReq.deleteData(id, etag, lastMod);
+					
+					// Check server response to be sure
+					// the record was actually deleted
+					System.out.println("RESPONSE: " + httpReq.responseCode());
+					
+					// 
 					System.out.println("DELETE ROW " + row);
+					// tmodel.removeRow(row);
 					
 				} catch(Exception ex) {
 					JOptionPane.showMessageDialog(frame,
 						    "The operation could not be completed",
 						    "Error",
 						    JOptionPane.ERROR_MESSAGE);
-				}
+				} 
 			}
 		}
 	}
@@ -332,8 +354,20 @@ public class Main implements Constants {
 		}
 	}
 	
+	static public class MyRenderer extends DefaultTableCellRenderer {
+	    @Override
+	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column); 
+	        setBorder(noFocusBorder);
+	        return this;
+	    }
+
+	}
+	
 	private static JFrame frame = new JFrame("Restful Client Demo");
 	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
 	private static NewRecordDialog newRecDialog;
-	private static JTable jTable;	 
+	private static JTable jTable;
+	private static TableModel tmodel;
+	private static HTTPRequest httpReq;
 }
