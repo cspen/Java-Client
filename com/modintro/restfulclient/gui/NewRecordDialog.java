@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.modintro.restfulclient.model.Constants;
 import com.modintro.restfulclient.model.HTTPRequest;
+import com.modintro.restfulclient.model.TableModel;
 
 import test.jaxb.Departments;
 import test.jaxb.Employees;
@@ -37,10 +38,11 @@ import test.jaxb.Employees.Employee;
 public class NewRecordDialog extends JDialog
 		implements ActionListener, Constants, WindowListener {
 	
-	public NewRecordDialog(JFrame window) {
+	public NewRecordDialog(JFrame window, TableModel tmodel) {
 		super(window, "New Employee", true);
 		addWindowListener(this);
 		this.window = window;
+		this.tmodel = tmodel;
 		setSize(100, 100);
 		
 		JPanel form = new JPanel(new GridBagLayout());
@@ -232,11 +234,15 @@ public class NewRecordDialog extends JDialog
 					data += "&hdate=" + year + "-" + month + "-" + day;
 					String response = httpReq.postData(data);
 					if(httpReq.responseCode() == 201) {
-						// Alert human and update table
+						// Alert human (need better message);
 						JOptionPane.showMessageDialog(this, "Success");
-						// TO-DO: Add new row to table
+						
 						// Need to call server again to get
 						// etag and last modified columns
+						String newRec = httpReq.responseMessage();
+						String[] parts = newRec.split("^/$");
+						for(int i = 0; i < parts.length; i++)
+							System.out.println("! " + parts[i]);
 					} else {
 						JOptionPane.showMessageDialog(this,
 								"The operation could not be completed");
@@ -319,6 +325,7 @@ public class NewRecordDialog extends JDialog
 	public void windowOpened(WindowEvent e) {}
 	
 	private JFrame window;
+	private TableModel tmodel;
 	private JButton ok;
 	private JButton cancel;
 	
