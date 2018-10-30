@@ -150,7 +150,7 @@ public class Main implements Constants {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		// Add dialog boxes
-		newRecDialog = new NewRecordDialog(frame);
+		newRecDialog = new NewRecordDialog(frame, tmodel);
         
         frame.setVisible(true);
         // frame.pack();
@@ -192,11 +192,11 @@ public class Main implements Constants {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			// frame.getContentPane().setBackground(Color.RED);
 			Rectangle bounds = frame.getBounds();
 			newRecDialog.setLocation(bounds.x + bounds.width/3,
 					bounds.y + bounds.height/3);
-			newRecDialog.setVisible(true);			
+			newRecDialog.setVisible(true);
+			
 		}
 	}
 	
@@ -237,11 +237,14 @@ public class Main implements Constants {
 					
 					// Check server response to be sure
 					// the record was actually deleted
-					System.out.println("RESPONSE: " + httpReq.responseCode());
-					
-					// 
-					System.out.println("DELETE ROW " + row);
-					// tmodel.removeRow(row);
+					if(httpReq.responseCode() == 204) {
+						tmodel.removeRow(row);
+					} else {
+						JOptionPane.showMessageDialog(frame,
+								"The operation could not be completed.",
+								"Oops!",
+								JOptionPane.ERROR_MESSAGE);
+					}
 					
 				} catch(Exception ex) {
 					JOptionPane.showMessageDialog(frame,
