@@ -30,6 +30,10 @@ public class TableModel extends AbstractTableModel implements Constants {
         fireTableStructureChanged();
     }
 	
+	public void setHTTPRequest(HTTPRequest httpReq) {
+		this.httpReq = httpReq;
+	}
+	
 	public int getColumnCount() {
 		return columnIdentifiers.size();
 	}
@@ -66,17 +70,26 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 		// Prevent unnecessary updates - conserve bandwidth
 		if(!value.equals(obj)) {
-			rowVector.setElementAt(value, col);
-			fireTableCellUpdated(row, col);
+			if(!value.equals("")) { // Check for empty input
+				
+				// Update server before updating local
+				// TO-DO: make call to server
+				// then make another call to get
+				// new etag and last modified fields
+				rowVector.setElementAt(value, col);
+				fireTableCellUpdated(row, col);
+			} 
 		}
 	}
 	
 	public void removeRow(int row) {
-        dataList.remove(row);
+		// Remove row from server
+        dataList.removeElementAt(row);
         fireTableRowsDeleted(row, row);
     }
 	
 	public void insertRow(int row, Object[] rowData) {
+		// Insert row on the server
         insertRow(row, convertToVector(rowData));
     }
 	
@@ -112,4 +125,5 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 	private Vector<Vector<Object>> dataList;
 	private Vector<Object> columnIdentifiers;
+	private HTTPRequest httpReq;
 }
