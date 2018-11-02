@@ -64,6 +64,7 @@ public class TableModel extends AbstractTableModel implements Constants {
 	}
 	
 	// Implement if table's data can change
+	@Override
 	public void setValueAt(Object value, int row, int col) {
 		Vector<Object> rowVector = (Vector<Object>)dataList.elementAt(row);
 		Object obj = rowVector.get(col);
@@ -74,12 +75,51 @@ public class TableModel extends AbstractTableModel implements Constants {
 				
 				// Update server before updating local
 				// TO-DO: make call to server
-				// then make another call to get
-				// new etag and last modified fields
-				rowVector.setElementAt(value, col);
-				fireTableCellUpdated(row, col);
+				/*
+				String data = "";
+				Integer id = (Integer)getValueAt(row, 0);
+				String fname = (String)getValueAt(row, 1);
+				String lname = (String)getValueAt(row, 2);
+				String dept = (String)getValueAt(row, 3);
+				Boolean ftime = (Boolean)getValueAt(row, 4);
+				String hdate = (String)getValueAt(row, 5);
+				Integer sal = (Integer)getValueAt(row, 6);
+				String etag = (String)getValueAt(row, 4);
+				String lmod = (String)getValueAt(row, 4);
+				
+				data = "{ Employee: { \"lastname\":\"" + lname + "\", " +
+					"\"firstname\":\"" + fname + "\", \"department\":\"" + dept + "\", " +
+					"\"fulltime\":\"" + ftime + "\", \"hiredate\":\"" + hdate + "\", " +
+					"\"salary\":\"" + sal + "\" }";
+				
+				try {
+					httpReq.putData(id, data, etag, lmod);
+				
+					// then make another call to get
+					// new etag and last modified fields
+					rowVector.setElementAt(value, col);
+					fireTableCellUpdated(row, col);
+				} catch (Exception e) {
+					
+				}
+				*/
+				notifyUpdateListener(value, row, col);
 			} 
 		}
+	}
+	
+	private void notifyUpdateListener(Object value, int row, int col) {
+		this.updateListener.update(value, row, col);
+	}
+	
+	public void addUpdateListener(UpdateListener ul) {
+		this.updateListener = ul;
+	}
+	
+	public void updateValueAt(Object value, int row, int col) {
+		Vector<Object> rowVector = (Vector<Object>)dataList.elementAt(row);
+		rowVector.setElementAt(value, col);
+		fireTableCellUpdated(row, col);
 	}
 	
 	public void removeRow(int row) {
@@ -125,5 +165,6 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 	private Vector<Vector<Object>> dataList;
 	private Vector<Object> columnIdentifiers;
-	private HTTPRequest httpReq;
+	private HTTPRequest httpReq = new HTTPRequest(APP_URL);
+	private UpdateListener updateListener = null;
 }
