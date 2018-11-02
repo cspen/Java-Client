@@ -1,5 +1,8 @@
 /**
+ * GUI for JTable application.
  * 
+ * @author Craig Spencer <craigspencer@modintro.com>
+ * Last Modified: 11/1/2018
  */
 package com.modintro.restfulclient.gui;
 
@@ -11,52 +14,34 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URI;
-import java.net.URL;
 import java.text.Format;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
-import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import com.modintro.restfulclient.model.Constants;
 import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
+import com.modintro.restfulclient.model.UpdateListener;
 import com.modintro.restfulclient.model.ServerResponseParser; 
 
-/**
- * @author Craig Spencer <craigspencer@modintro.com>
- * 
- */
 public class Main implements Constants {
 
 	/**
@@ -69,8 +54,6 @@ public class Main implements Constants {
 	            }
 	        });
 	}
-	
-	
 	
 	private static void createAndShowGUI() {
 		//Create and set up the window.
@@ -112,6 +95,7 @@ public class Main implements Constants {
         	
         	tmodel = new TableModel(xmlp.getData(), xmlp.getColumnNames());
         	tmodel.setHTTPRequest(httpReq);
+        	tmodel.addUpdateListener(new Update());
         	
         } catch (Exception e) {
         	System.out.println(e.getMessage());
@@ -161,6 +145,11 @@ public class Main implements Constants {
 		// Methods for TableModelInterface
 		@Override
 		public void tableChanged(TableModelEvent te) {
+			// This design doesn't utilize this method
+			// because this method isn't called until
+			// after the table has been changed.
+			
+			/*
 			int row = te.getFirstRow();
 			int column = te.getColumn();
 			int type = te.getType();
@@ -174,12 +163,19 @@ public class Main implements Constants {
 				msg = "UPDATE ROW " + row;
 			}			
 			System.out.println(msg);
+			*/
 			
 			// TableModel model = (TableModel)te.getSource();
 			// String columnName = model.getColumnName(column);
 			// Object data = model.getValueAt(row, column);
 			
 			// System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
+		}
+	}
+	
+	static class Update implements UpdateListener {
+		public void update(Object value, int row, int col) {
+			tmodel.updateValueAt(value, row, col);
 		}
 	}
 	
@@ -195,8 +191,7 @@ public class Main implements Constants {
 			Rectangle bounds = frame.getBounds();
 			newRecDialog.setLocation(bounds.x + bounds.width/3,
 					bounds.y + bounds.height/3);
-			newRecDialog.setVisible(true);
-			
+			newRecDialog.setVisible(true);			
 		}
 	}
 	
@@ -314,8 +309,7 @@ public class Main implements Constants {
 	        JFormattedTextField ftf = (JFormattedTextField)getComponent();
 	        String s = (String)ftf.getValue();
 	        if (s.matches("^[A-Za-z]+ ?[A-Za-z]*$")) {
-	        	System.out.println("FAT CITY");
-	            try {
+	        	try {
 	                ftf.commitEdit();
 	            } catch (java.text.ParseException exc) { }
 		    
@@ -323,9 +317,7 @@ public class Main implements Constants {
 	            return false; //don't let the editor go away
 		    } 
 	        return super.stopCellEditing();
-	    }
-
-		
+	    }		
 	}
 	
 	public static class NumberRenderer extends DefaultTableCellRenderer {
@@ -364,7 +356,6 @@ public class Main implements Constants {
 	        setBorder(noFocusBorder);
 	        return this;
 	    }
-
 	}
 	
 	private static JFrame frame = new JFrame("Restful Client Demo");
