@@ -175,7 +175,53 @@ public class Main implements Constants {
 	
 	static class Update implements UpdateListener {
 		public void update(Object value, int row, int col) {
-			tmodel.updateValueAt(value, row, col);
+			// Update server before updating local model
+			String data = createDataString(value, row, col);
+			Integer id = (Integer)tmodel.getValueAt(row, 0);
+			String etag = (String)tmodel.getValueAt(row, 7);
+			String lmod = (String)tmodel.getValueAt(row, 8);
+			
+			try {
+				httpReq.putData(id, data, etag, lmod);
+			
+				// then make another call to get
+				// new etag and last modified fields
+				tmodel.updateValueAt(value, row, col);
+			} catch (Exception e) {
+				
+			}			
+		}
+		
+		/*
+		 * Create a JSON string from the data in the specified row.
+		 * The value of the data at the cell with the specified row
+		 * and column will be replaced by the specified value.
+		 */
+		private String createDataString(Object value, int row, int col) {
+			String data = "";
+			Integer id = (Integer)tmodel.getValueAt(row, 0);
+			String fname = (String)tmodel.getValueAt(row, 1);
+			String lname = (String)tmodel.getValueAt(row, 2);
+			String dept = (String)tmodel.getValueAt(row, 3);
+			Boolean ftime = (Boolean)tmodel.getValueAt(row, 4);
+			String hdate = (String)tmodel.getValueAt(row, 5);
+			Integer sal = (Integer)tmodel.getValueAt(row, 6);
+			
+			// Update edited column
+			switch(col) {
+				case 1: fname = (String)value;
+				case 2: lname = (String)value;
+				case 3: dept = (String)value;
+				case 4: ftime = (Boolean)value;
+				case 6:	sal = (Integer)value;	
+			}
+			
+			data = "{ Employee: { \"lastname\":\"" + lname + "\", " +
+				"\"firstname\":\"" + fname + "\", \"department\":\"" + dept + "\", " +
+				"\"fulltime\":\"" + ftime + "\", \"hiredate\":\"" + hdate + "\", " +
+				"\"salary\":\"" + sal + "\" }";
+			
+			return data;
 		}
 	}
 	
