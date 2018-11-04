@@ -58,7 +58,7 @@ public class HTTPRequest {
 	}
 	
 	public String getData(int page, int pageSize,
-			String sortBy, Boolean sortOrder) throws Exception{
+			String sortBy, Boolean sortOrder) throws Exception {
 		String params = "?page=" + page + "&pagesize=" + pageSize
 				+ "&sort=" + sortBy + "&order=" + sortOrder;
 		return request("GET", params);
@@ -107,7 +107,7 @@ public class HTTPRequest {
         URLConn.setRequestMethod("PUT");
         URLConn.setRequestProperty("Content-Type", "application/json");
         if(etag != null)
-        	URLConn.setRequestProperty("If-Matches", etag);
+        	URLConn.setRequestProperty("If-Match", etag);
         if(lastModified != null)
         	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
     	
@@ -134,7 +134,7 @@ public class HTTPRequest {
     private String urlResponseReader(HttpURLConnection URLConn) throws Exception {
     	this.responseCode = URLConn.getResponseCode();
     	this.responseMessage = URLConn.getResponseMessage();
-        BufferedReader in = new BufferedReader(
+    	BufferedReader in = new BufferedReader(
         	new InputStreamReader(URLConn.getInputStream()));
     	
     	String inputLine;
@@ -150,7 +150,7 @@ public class HTTPRequest {
     	return this.responseCode;
     }
     
-    public String getResponseMessage() {
+    public String responseMessage() {
     	return this.responseMessage;
     }
     
