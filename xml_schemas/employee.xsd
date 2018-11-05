@@ -18,9 +18,8 @@
 				<xsd:element name="hire_date" type="xsd:date"/>
 				<xsd:element name="salary" type="xsd:positiveInteger"/>
 				<xsd:element name="etag" type="xsd:string"/>
-				<xsd:element name="last_modified" type="xsd:dateTime"/>
+				<xsd:element name="last_modified" type="xsd:string"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>
-		
