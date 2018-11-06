@@ -15,6 +15,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.StringReader;
 import java.net.URI;
 import java.text.Format;
 import java.text.NumberFormat;
@@ -35,11 +36,18 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 
 import com.modintro.restfulclient.model.Constants;
 import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
 import com.modintro.restfulclient.model.UpdateListener;
+
+import test.jaxb.Employee;
+import work.jaxb.Row;
+
 import com.modintro.restfulclient.model.ServerResponseParser; 
 
 public class Main implements Constants {
@@ -123,10 +131,12 @@ public class Main implements Constants {
         colModel.getColumn(2).setCellEditor(new TextVerifier());     
         		
         // Hide etag and last-modified columns
+        /*
         jTable.getColumnModel().getColumn(7).setMinWidth(0);
         jTable.getColumnModel().getColumn(8).setMinWidth(0);
         jTable.getColumnModel().getColumn(7).setMaxWidth(0);
         jTable.getColumnModel().getColumn(8).setMaxWidth(0);
+        */
         
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
@@ -173,6 +183,9 @@ public class Main implements Constants {
 		}
 	}
 	
+	/*
+	 * A class to receive and process table cell changes.
+	 */
 	static class Update implements UpdateListener {
 		public void update(Object value, int row, int col) {
 			// Update server before updating local model
@@ -183,12 +196,39 @@ public class Main implements Constants {
 			
 			try {
 				httpReq.putData(id, data, etag, lmod);
-			
-				// then make another call to get
-				// new etag and last modified fields
-				tmodel.updateValueAt(value, row, col);
+				int code = httpReq.responseCode();
+				if(code == 204) {
+					// Make another call to get
+					// new etag and last modified fields
+					String newData = httpReq.getData(id, null, null);
+					JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
+					Unmarshaller u = jbc.createUnmarshaller();
+					
+					// System.out.println("ND: " + newData);
+					test.jaxb.Employee emp = (test.jaxb.Employee)u.unmarshal(
+							new StreamSource(new StringReader(newData)));
+					Object newLastMod = emp.getLastModified();
+					
+					// Update the table row
+					tmodel.updateValueAt(value, row, col);
+					tmodel.updateValueAt(emp.getEtag(), row, 7);
+					tmodel.updateValueAt(newLastMod, row, 8);
+				} else {
+					JOptionPane.showMessageDialog(frame, "BOOM!");
+				}
 			} catch (Exception e) {
-				
+				// For some reason a 412 response throws an exception
+				if(httpReq.responseCode() == 412) { // Precondition failed
+					JOptionPane.showMessageDialog(frame,
+							"Update not completed. Server ");
+					// Get "fresh" data from server
+					
+					
+					
+				} else {
+					JOptionPane.showMessageDialog(frame, "Oops!");
+					e.printStackTrace();
+				}
 			}			
 		}
 		
@@ -200,28 +240,41 @@ public class Main implements Constants {
 		private String createDataString(Object value, int row, int col) {
 			String data = "";
 			Integer id = (Integer)tmodel.getValueAt(row, 0);
-			String fname = (String)tmodel.getValueAt(row, 1);
-			String lname = (String)tmodel.getValueAt(row, 2);
+			String lname = (String)tmodel.getValueAt(row, 1);
+			String fname = (String)tmodel.getValueAt(row, 2);
 			String dept = (String)tmodel.getValueAt(row, 3);
-			Boolean ftime = (Boolean)tmodel.getValueAt(row, 4);
+			
+			String ftime = "0";
+			if(((Boolean)tmodel.getValueAt(row, 4)).booleanValue()) {
+				ftime = "1";
+			};
 			String hdate = (String)tmodel.getValueAt(row, 5);
 			Integer sal = (Integer)tmodel.getValueAt(row, 6);
 			
 			// Update edited column
 			switch(col) {
-				case 1: fname = (String)value;
-				case 2: lname = (String)value;
-				case 3: dept = (String)value;
-				case 4: ftime = (Boolean)value;
-				case 6:	sal = (Integer)value;	
+				case 1: lname = (String)value; break;
+				case 2: fname = (String)value; break;
+				case 3: dept = (String)value; break;
+				case 4: if(((Boolean)value).booleanValue()) {
+							ftime = "1"; 
+						} else {
+							ftime = "0";
+						}
+						break;
+				case 6:	sal = (Integer)value; break;
 			}
 			
-			data = "{ Employee: { \"lastname\":\"" + lname + "\", " +
+			data = "{ \"lastname\":\"" + lname + "\", " +
 				"\"firstname\":\"" + fname + "\", \"department\":\"" + dept + "\", " +
 				"\"fulltime\":\"" + ftime + "\", \"hiredate\":\"" + hdate + "\", " +
 				"\"salary\":\"" + sal + "\" }";
 			
 			return data;
+		}
+		
+		private void updateRow() {
+			
 		}
 	}
 	
