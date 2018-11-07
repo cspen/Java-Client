@@ -12,15 +12,15 @@
 				<xsd:element name="Employee" minOccurs="0" maxOccurs="unbounded">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="employeeID" type="xsd:positiveInteger"/>
+							<xsd:element name="employeeID" type="xsd:int"/>
 							<xsd:element name="last_name" type="xsd:string"/>
 							<xsd:element name="first_name" type="xsd:string"/>
 							<xsd:element name="department" type="xsd:string"/>
 							<xsd:element name="full_time" type="xsd:boolean"/>
-							<xsd:element name="hire_date" type="xsd:date"/>
-							<xsd:element name="salary" type="xsd:positiveInteger"/>
+							<xsd:element name="hire_date" type="xsd:string"/>
+							<xsd:element name="salary" type="xsd:int"/>
 							<xsd:element name="etag" type="xsd:string"/>
-							<xsd:element name="last_modified" type="xsd:dateTime"/>
+							<xsd:element name="last_modified" type="xsd:string"/>
 						</xsd:sequence>
 					</xsd:complexType>									
 				</xsd:element>
