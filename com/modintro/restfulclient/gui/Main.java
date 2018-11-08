@@ -45,9 +45,6 @@ import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
 import com.modintro.restfulclient.model.UpdateListener;
 
-import test.jaxb.Employee;
-import work.jaxb.Row;
-
 import com.modintro.restfulclient.model.ServerResponseParser; 
 
 public class Main implements Constants {
@@ -64,8 +61,7 @@ public class Main implements Constants {
 	}
 	
 	private static void createAndShowGUI() {
-		//Create and set up the window.
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Center the window
         Toolkit tKit = frame.getToolkit();
@@ -131,12 +127,10 @@ public class Main implements Constants {
         colModel.getColumn(2).setCellEditor(new TextVerifier());     
         		
         // Hide etag and last-modified columns
-        /*
         jTable.getColumnModel().getColumn(7).setMinWidth(0);
         jTable.getColumnModel().getColumn(8).setMinWidth(0);
         jTable.getColumnModel().getColumn(7).setMaxWidth(0);
         jTable.getColumnModel().getColumn(8).setMaxWidth(0);
-        */
         
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
@@ -173,13 +167,7 @@ public class Main implements Constants {
 				msg = "UPDATE ROW " + row;
 			}			
 			System.out.println(msg);
-			*/
-			
-			// TableModel model = (TableModel)te.getSource();
-			// String columnName = model.getColumnName(column);
-			// Object data = model.getValueAt(row, column);
-			
-			// System.out.println("DATACHANGE: r: " + row + " c: " + column + " d: " + data + "\n");
+			*/			
 		}
 	}
 	
@@ -201,33 +189,35 @@ public class Main implements Constants {
 					// Make another call to get
 					// new etag and last modified fields
 					String newData = httpReq.getData(id, null, null);
-					JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
-					Unmarshaller u = jbc.createUnmarshaller();
-					
-					// System.out.println("ND: " + newData);
-					test.jaxb.Employee emp = (test.jaxb.Employee)u.unmarshal(
-							new StreamSource(new StringReader(newData)));
-					Object newLastMod = emp.getLastModified();
-					
-					// Update the table row
-					tmodel.updateValueAt(value, row, col);
-					tmodel.updateValueAt(emp.getEtag(), row, 7);
-					tmodel.updateValueAt(newLastMod, row, 8);
+					updateRow(newData, row);
 				} else {
-					JOptionPane.showMessageDialog(frame, "BOOM!");
+					JOptionPane.showMessageDialog(frame,
+							"Message",
+							"Title",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (Exception e) {
 				// For some reason a 412 response throws an exception
+				// in the URLConnection class
 				if(httpReq.responseCode() == 412) { // Precondition failed
 					JOptionPane.showMessageDialog(frame,
-							"Update not completed. Server ");
+							"Unable to update. Server had newer record.",
+							"Error",
+							JOptionPane.ERROR_MESSAGE);
 					// Get "fresh" data from server
-					
-					
-					
+					try {
+						String newData = httpReq.getData(id, null, null);
+						updateRow(newData, row);
+					} catch(Exception ex) {
+						JOptionPane.showMessageDialog(frame,
+								"Update not completed. Server ");
+					}					
 				} else {
-					JOptionPane.showMessageDialog(frame, "Oops!");
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(frame,
+							"Oops!",
+							"Title",
+							JOptionPane.ERROR_MESSAGE);
+					// e.printStackTrace();
 				}
 			}			
 		}
@@ -273,8 +263,27 @@ public class Main implements Constants {
 			return data;
 		}
 		
-		private void updateRow() {
+		// Update a row in the jtable
+		private void updateRow(String newData, int row) throws Exception {
+			JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
+			Unmarshaller u = jbc.createUnmarshaller();
 			
+			// System.out.println("ND: " + newData);
+			test.jaxb.Employee emp = (test.jaxb.Employee)u.unmarshal(
+					new StreamSource(new StringReader(newData)));
+			
+			Object newLastMod = emp.getLastModified();
+			
+			// Update the table row
+			tmodel.updateValueAt(emp.getEmployeeID(), row, 0);
+			tmodel.updateValueAt(emp.getLastName(), row, 1);
+			tmodel.updateValueAt(emp.getFirstName(), row, 2);
+			tmodel.updateValueAt(emp.getDepartment(), row, 3);
+			tmodel.updateValueAt(emp.isFullTime(), row, 4);
+			tmodel.updateValueAt(emp.getHireDate(), row, 5);
+			tmodel.updateValueAt(emp.getSalary(), row, 6);
+			tmodel.updateValueAt(emp.getEtag(), row, 7);
+			tmodel.updateValueAt(newLastMod, row, 8);
 		}
 	}
 	
@@ -375,7 +384,7 @@ public class Main implements Constants {
 		public void actionPerformed(ActionEvent e) {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().browse(new URI("http://www.yahoo.com"));
+					Desktop.getDesktop().browse(new URI("http://github.com/cspen"));
 				} catch(Exception ex) {
 					System.out.println(ex.getMessage());
 				}
@@ -458,7 +467,6 @@ public class Main implements Constants {
 	}
 	
 	private static JFrame frame = new JFrame("Restful Client Demo");
-	private static final String DEPT_LIST_URL = "http://localhost/GEM/rest/departments/";
 	private static NewRecordDialog newRecDialog;
 	private static JTable jTable;
 	private static TableModel tmodel;
