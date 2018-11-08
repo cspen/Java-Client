@@ -2,7 +2,7 @@
  * GUI for JTable application.
  * 
  * @author Craig Spencer <craigspencer@modintro.com>
- * Last Modified: 11/1/2018
+ * Last Modified: 11/8/2018
  */
 package com.modintro.restfulclient.gui;
 
@@ -73,9 +73,15 @@ public class Main implements Constants {
         JMenuBar menuBar = new JMenuBar();
         NewAction newAct = new NewAction("New", "Create a new record", new Integer(KeyEvent.VK_N));
         DeleteAction deleteAct = new DeleteAction("Delete", "Delete a record", new Integer(KeyEvent.VK_D));
+        RefreshAction refAct = new RefreshAction("Refresh", "Refresh the table", new Integer(KeyEvent.VK_R));
+        ExitAction extAct = new ExitAction("Exit", new Integer(KeyEvent.VK_E));
         JMenu fileMenu = new JMenu("File");
         fileMenu.add(newAct);        
         fileMenu.add(deleteAct);
+        fileMenu.addSeparator();
+        fileMenu.add(refAct);
+        fileMenu.addSeparator();
+        fileMenu.add(extAct);
                
         JMenu helpMenu = new JMenu("Help");
         HowToAction howToAct = new HowToAction("How to...", "Help", new Integer(KeyEvent.VK_T));
@@ -200,8 +206,10 @@ public class Main implements Constants {
 				// For some reason a 412 response throws an exception
 				// in the URLConnection class
 				if(httpReq.responseCode() == 412) { // Precondition failed
+					String errStr = "Unable to update. Server contained more recent record." +
+							"Local record updated from server.";							
 					JOptionPane.showMessageDialog(frame,
-							"Unable to update. Server had newer record.",
+							errStr,
 							"Error",
 							JOptionPane.ERROR_MESSAGE);
 					// Get "fresh" data from server
@@ -210,12 +218,14 @@ public class Main implements Constants {
 						updateRow(newData, row);
 					} catch(Exception ex) {
 						JOptionPane.showMessageDialog(frame,
-								"Update not completed. Server ");
+								"The operation could not be completed",
+								"Oops!",
+								JOptionPane.ERROR_MESSAGE);
 					}					
 				} else {
 					JOptionPane.showMessageDialog(frame,
+							"The operation could not be completed due to server error.",
 							"Oops!",
-							"Title",
 							JOptionPane.ERROR_MESSAGE);
 					// e.printStackTrace();
 				}
@@ -359,6 +369,31 @@ public class Main implements Constants {
 		}
 	}
 	
+	static class RefreshAction extends AbstractAction {
+		public RefreshAction(String text, String desc, int mnemonic) {
+			super(text);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			
+		}
+	}
+	
+	static class ExitAction extends AbstractAction {
+		
+		public ExitAction(String text, int mnemonic) {
+			super(text);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			frame.dispose();
+			System.exit(0);
+		}
+	}
+	
 	static class HowToAction extends AbstractAction {
 		
 		public HowToAction(String text, String desc, int mnemonic) {
@@ -393,6 +428,10 @@ public class Main implements Constants {
 		}
 	}
 	
+	
+	//
+	// Classes below are for the JTable and not the JFrame
+	// 
 	public static class TextVerifier extends DefaultCellEditor {
 		JFormattedTextField tf;
 		
