@@ -98,15 +98,7 @@ public class Main implements Constants {
         
         // Add JTable
         try {
-        	// URL theService = new URL(APP_URL);
-        	httpReq = new HTTPRequest(APP_URL);
-        	String data = httpReq.getData();
-        	ServerResponseParser xmlp = new ServerResponseParser(data);
-        	
-        	tmodel = new TableModel(xmlp.getData(), xmlp.getColumnNames());
-        	tmodel.setHTTPRequest(httpReq);
-        	tmodel.addUpdateListener(new Update());
-        	
+        	tmodel = getTableModel();        	
         } catch (Exception e) {
         	System.out.println(e.getMessage());
         	String msg = "\nClosing Application";
@@ -116,10 +108,25 @@ public class Main implements Constants {
         }
         
         jTable = new JTable(tmodel);
-        tmodel.addTableModelListener(new TableListener());
         jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
         
-        JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
+        
+        initTable();
+        
+		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
+		jTable.setFillsViewportHeight(true);
+		JScrollPane scrollPane = new JScrollPane(jTable);		
+		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		
+		// Add dialog boxes
+		newRecDialog = new NewRecordDialog(frame, tmodel);
+        
+        frame.setVisible(true);
+        // frame.pack();
+	}
+	
+	public static void initTable() {
+		JComboBox<String> deptCombo = NewRecordDialog.createDeptCombo();
         TableColumnModel colModel = jTable.getColumnModel();
         
         // Set combo box for department column
@@ -132,49 +139,23 @@ public class Main implements Constants {
         colModel.getColumn(1).setCellEditor(new TextVerifier());
         colModel.getColumn(2).setCellEditor(new TextVerifier());     
         		
-        // Hide etag and last-modified columns
+		// Hide etag and last-modified columns
         jTable.getColumnModel().getColumn(7).setMinWidth(0);
         jTable.getColumnModel().getColumn(8).setMinWidth(0);
         jTable.getColumnModel().getColumn(7).setMaxWidth(0);
         jTable.getColumnModel().getColumn(8).setMaxWidth(0);
-        
-		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
-		jTable.setFillsViewportHeight(true);
-		JScrollPane scrollPane = new JScrollPane(jTable);		
-		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-		
-		// Add dialog boxes
-		newRecDialog = new NewRecordDialog(frame, tmodel);
-        
-        frame.setVisible(true);
-        // frame.pack();
-	}	
+	}
 	
-	static class TableListener implements TableModelListener {
-	
-		// Methods for TableModelInterface
-		@Override
-		public void tableChanged(TableModelEvent te) {
-			// This design doesn't utilize this method
-			// because this method isn't called until
-			// after the table has been changed.
-			
-			/*
-			int row = te.getFirstRow();
-			int column = te.getColumn();
-			int type = te.getType();
-			
-			String msg = "";
-			if(type == TableModelEvent.DELETE) {
-				msg = "DELETE ROW " + row;
-			} else if(type == TableModelEvent.INSERT) {
-				msg = "INSERT NEW ROW";
-			} else if(type == TableModelEvent.UPDATE) {
-				msg = "UPDATE ROW " + row;
-			}			
-			System.out.println(msg);
-			*/			
-		}
+	public static TableModel getTableModel() throws Exception {
+		// URL theService = new URL(APP_URL);
+    	httpReq = new HTTPRequest(APP_URL);
+    	String data = httpReq.getData();
+    	ServerResponseParser xmlp = new ServerResponseParser(data);
+    	
+    	TableModel tm = new TableModel(xmlp.getData(), xmlp.getColumnNames());
+    	tm.addTableModelListener(new TableListener());
+    	tm.addUpdateListener(new Update());
+    	return tm;
 	}
 	
 	/*
@@ -369,6 +350,7 @@ public class Main implements Constants {
 		}
 	}
 	
+	// Refresh the JTable from server
 	static class RefreshAction extends AbstractAction {
 		public RefreshAction(String text, String desc, int mnemonic) {
 			super(text);
@@ -377,10 +359,18 @@ public class Main implements Constants {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			
+			try {
+				tmodel = getTableModel();
+				jTable.setModel(tmodel);
+				initTable();
+				
+			} catch(Exception ex) {
+				JOptionPane.showMessageDialog(frame, "Unable to refresh");
+			}
 		}
 	}
 	
+	// Close the application
 	static class ExitAction extends AbstractAction {
 		
 		public ExitAction(String text, int mnemonic) {
@@ -394,6 +384,7 @@ public class Main implements Constants {
 		}
 	}
 	
+	// Open help menu
 	static class HowToAction extends AbstractAction {
 		
 		public HowToAction(String text, String desc, int mnemonic) {
@@ -407,6 +398,7 @@ public class Main implements Constants {
 		}
 	}
 	
+	// Open about page
 	static class AboutAction extends AbstractAction {
 		
 		public AboutAction(String text, String desc, int mnemonic) {
@@ -415,11 +407,18 @@ public class Main implements Constants {
 			putValue(MNEMONIC_KEY, mnemonic);
 		}
 		
-		// Open web page in human's default browser
 		public void actionPerformed(ActionEvent e) {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().browse(new URI("http://github.com/cspen"));
+					String aboutMsg = "<html><h3>Java Client Application</h3>"
+							+ "<p>Created by Craig Spencer</p>"
+							+ "<p>November 2018</p>"
+							+ "</html>";
+					JOptionPane.showMessageDialog(frame,
+							aboutMsg,
+						    "About",
+						    JOptionPane.PLAIN_MESSAGE);
+					// Desktop.getDesktop().browse(new URI("http://github.com/cspen"));
 				} catch(Exception ex) {
 					System.out.println(ex.getMessage());
 				}
@@ -503,6 +502,33 @@ public class Main implements Constants {
 	        setBorder(noFocusBorder);
 	        return this;
 	    }
+	}
+	
+	static class TableListener implements TableModelListener {
+		
+		// Methods for TableModelInterface
+		@Override
+		public void tableChanged(TableModelEvent te) {
+			// This design doesn't utilize this method
+			// because this method isn't called until
+			// after the table has been changed.
+			
+			/*
+			int row = te.getFirstRow();
+			int column = te.getColumn();
+			int type = te.getType();
+			
+			String msg = "";
+			if(type == TableModelEvent.DELETE) {
+				msg = "DELETE ROW " + row;
+			} else if(type == TableModelEvent.INSERT) {
+				msg = "INSERT NEW ROW";
+			} else if(type == TableModelEvent.UPDATE) {
+				msg = "UPDATE ROW " + row;
+			}			
+			System.out.println(msg);
+			*/			
+		}
 	}
 	
 	private static JFrame frame = new JFrame("Restful Client Demo");
