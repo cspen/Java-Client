@@ -19,11 +19,9 @@ public class StatusBar extends JPanel {
 		add(pagePane);
 	}
 	
-	private void setPagePane(Color color) {
-		
-	}
+	private void setPagePane(Color color) {}
 	
-	private StatusPane pagePane = new StatusPane("TEST");
+	private StatusPane pagePane = new StatusPane("Employees");
 	
 	class StatusPane extends JLabel {
 		
@@ -32,7 +30,7 @@ public class StatusBar extends JPanel {
 			setForeground(Color.black);
 			setHorizontalAlignment(CENTER);
 			setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-			setPreferredSize(new Dimension(100, 20));
+			setPreferredSize(new Dimension(200, 20));
 			setText(text);
 		}
 	}

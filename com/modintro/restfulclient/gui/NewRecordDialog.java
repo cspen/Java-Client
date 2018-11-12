@@ -1,7 +1,11 @@
 package com.modintro.restfulclient.gui;
 
+/**
+ * 
+ * @author Craig Spencer <craigspencer@modintro.com>
+ * Last Modified: 11/09/2018
+ */
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,8 +36,6 @@ import com.modintro.restfulclient.model.HTTPRequest;
 import com.modintro.restfulclient.model.TableModel;
 
 import test.jaxb.Departments;
-import test.jaxb.Employees;
-import test.jaxb.Employees.Employee;
 
 public class NewRecordDialog extends JDialog
 		implements ActionListener, Constants, WindowListener {
@@ -41,7 +43,6 @@ public class NewRecordDialog extends JDialog
 	public NewRecordDialog(JFrame window, TableModel tmodel) {
 		super(window, "New Employee", true);
 		addWindowListener(this);
-		this.window = window;
 		this.tmodel = tmodel;
 		setSize(100, 100);
 		
@@ -123,7 +124,7 @@ public class NewRecordDialog extends JDialog
 		c.insets = new Insets(5, 5, 5, 5);
 		form.add(hireYear, c);
 		
-		int month = Calendar.getInstance().get(Calendar.MONTH);
+		int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 		hireMonth = createNumericCombo(1, 12, month);
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -192,8 +193,7 @@ public class NewRecordDialog extends JDialog
 		   			
 		} catch(Exception e) {
 			System.out.println(e.getMessage());			
-		}
-		
+		}		
 		return deptCombo;
 	}
 	
@@ -233,6 +233,7 @@ public class NewRecordDialog extends JDialog
 					data += "&ftime=" + ft;
 					data += "&hdate=" + year + "-" + month + "-" + day;
 					String response = httpReq.postData(data);
+					
 					if(httpReq.responseCode() == 201) {
 						// Alert human (need better message);
 						JOptionPane.showMessageDialog(this, "Success");
@@ -240,21 +241,52 @@ public class NewRecordDialog extends JDialog
 						// Need to call server again to get
 						// etag and last modified columns
 						String newRec = httpReq.responseMessage();
-						String[] parts = newRec.split("^/$");
-						for(int i = 0; i < parts.length; i++)
-							System.out.println("! " + parts[i]);
+						String[] parts = response.split("/");
+						Integer newRecId = new Integer(parts[parts.length-1]);
+						httpReq = new HTTPRequest(APP_URL + newRecId);
+						response = httpReq.getData();
+						
+						if(httpReq.responseCode() == 200) {
+							JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
+							Unmarshaller u = jbc.createUnmarshaller();
+							
+							test.jaxb.Employee emp = (test.jaxb.Employee)u.unmarshal(
+									new StreamSource(new StringReader(response)));
+							
+							Object[] newRow = new Object[9];
+							newRow[0] = emp.getEmployeeID();
+							newRow[1] = emp.getLastName();
+							newRow[2] = emp.getFirstName();
+							newRow[3] = emp.getDepartment();
+							newRow[4] = emp.isFullTime();
+							newRow[5] = emp.getHireDate();
+							newRow[6] = emp.getSalary();
+							newRow[7] = emp.getEtag();
+							newRow[8] = emp.getLastModified();
+							
+							tmodel.insertRow(0, newRow);									
+							reset();
+							setVisible(false);						    
+						} else {
+							errorDialog();
+						}						
 					} else {
-						JOptionPane.showMessageDialog(this,
-								"The operation could not be completed");
+						errorDialog();
 					}
 				} catch(Exception ex) {
-					JOptionPane.showMessageDialog(this, "BAD NEWS");
-					ex.printStackTrace();
+					JOptionPane.showMessageDialog(this, "BAD NEWS - Something went wrong");
+					// ex.printStackTrace();
 				}
 			}
-		} 
-		reset();
-		setVisible(false);
+		} else { // Cancel clicked
+			reset();
+			setVisible(false);
+		}
+	}
+	
+	private void errorDialog() {
+		JOptionPane.showMessageDialog(this,
+				"The operation could not be completed");
 	}
 	
 	private Boolean validateNewEmployee(String ln, String fn,
@@ -309,7 +341,7 @@ public class NewRecordDialog extends JDialog
 		deptCombo.setSelectedIndex(0);
 		ftCheck.setSelected(false);
 		hireYear.setSelectedItem(Calendar.getInstance().get(Calendar.YEAR));
-		hireMonth.setSelectedItem(Calendar.getInstance().get(Calendar.MONTH));
+		hireMonth.setSelectedItem(Calendar.getInstance().get(Calendar.MONTH) + 1);
 		hireDay.setSelectedItem(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 	}
 	
@@ -324,7 +356,6 @@ public class NewRecordDialog extends JDialog
 	public void windowIconified(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}
 	
-	private JFrame window;
 	private TableModel tmodel;
 	private JButton ok;
 	private JButton cancel;
@@ -337,6 +368,4 @@ public class NewRecordDialog extends JDialog
 	private JComboBox<Integer> hireMonth;
 	private JComboBox<Integer> hireDay;
 	private JTextField salary;
-	
-	private String[] departments = null;
 }

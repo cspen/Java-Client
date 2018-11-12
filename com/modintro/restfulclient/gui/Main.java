@@ -120,6 +120,7 @@ public class Main implements Constants {
 		
 		// Add dialog boxes
 		newRecDialog = new NewRecordDialog(frame, tmodel);
+		helpDialog = new HelpDialog(frame);
         
         frame.setVisible(true);
         // frame.pack();
@@ -394,7 +395,7 @@ public class Main implements Constants {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			frame.getContentPane().setBackground(Color.GREEN);
+			helpDialog.setVisible(true);
 		}
 	}
 	
@@ -533,6 +534,7 @@ public class Main implements Constants {
 	
 	private static JFrame frame = new JFrame("Restful Client Demo");
 	private static NewRecordDialog newRecDialog;
+	private static HelpDialog helpDialog;
 	private static JTable jTable;
 	private static TableModel tmodel;
 	private static HTTPRequest httpReq;
