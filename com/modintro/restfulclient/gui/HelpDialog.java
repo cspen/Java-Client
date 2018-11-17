@@ -1,7 +1,7 @@
 package com.modintro.restfulclient.gui;
 
 /**
- * Display a help dialog window. Content are loaded from
+ * Display a help dialog window. Content is loaded from
  * help.html.
  * 
  * @author Craig Spencer <craigspencer@modintro.com>
@@ -37,8 +37,7 @@ public class HelpDialog extends JDialog implements ActionListener {
 			jpane.setText(new String(bArr));
 		} catch(Exception ex) {
 			JOptionPane.showMessageDialog(this, 
-					"Help could not be loaded");
-			
+					"Help could not be loaded");			
 		}
 		
 		JScrollPane scrollPane = new JScrollPane(jpane);
@@ -46,17 +45,13 @@ public class HelpDialog extends JDialog implements ActionListener {
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setPreferredSize(new Dimension(250, 145));
 		// scrollPane.setMinimumSize(new Dimension(100, 100));
-		
-		
+				
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 		pack();
 	}
 	
-	public void actionPerformed(ActionEvent ae) {
-		
-	}
+	public void actionPerformed(ActionEvent ae) {}
 	
 	private static final String CONTENT_TYPE = "text/html";
 	private static final String HELP_CONTENT_FILE = "help.html";
-
 }

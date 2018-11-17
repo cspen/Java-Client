@@ -1,5 +1,12 @@
 package com.modintro.restfulclient.gui;
 
+/**
+ * A status bar for a JFrame application. Place
+ * the status bar at BorderLayout.SOUTH
+ * 
+ * @author Craig Spencer <craigspencer@modintro.com>
+ * Last Modified: 11/?/2018
+ */
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;

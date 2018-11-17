@@ -100,7 +100,7 @@ public class Main implements Constants {
         try {
         	tmodel = getTableModel();        	
         } catch (Exception e) {
-        	System.out.println(e.getMessage());
+        	// System.out.println(e.getMessage());
         	String msg = "\nClosing Application";
         	JOptionPane.showMessageDialog(frame, e.getMessage() + msg,
         			"Error", JOptionPane.ERROR_MESSAGE);
@@ -108,8 +108,7 @@ public class Main implements Constants {
         }
         
         jTable = new JTable(tmodel);
-        jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));
-        
+        jTable.setRowSorter(new TableRowSorter<TableModel>(tmodel));        
         
         initTable();
         
@@ -255,7 +254,7 @@ public class Main implements Constants {
 			return data;
 		}
 		
-		// Update a row in the jtable
+		// Update a row in the JTable
 		private void updateRow(String newData, int row) throws Exception {
 			JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
 			Unmarshaller u = jbc.createUnmarshaller();
@@ -505,8 +504,7 @@ public class Main implements Constants {
 	    }
 	}
 	
-	static class TableListener implements TableModelListener {
-		
+	static class TableListener implements TableModelListener {		
 		// Methods for TableModelInterface
 		@Override
 		public void tableChanged(TableModelEvent te) {

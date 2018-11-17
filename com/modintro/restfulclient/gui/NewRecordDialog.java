@@ -1,6 +1,8 @@
 package com.modintro.restfulclient.gui;
 
 /**
+ * Dialog window containing a form to enter information
+ * for a new record in the application.
  * 
  * @author Craig Spencer <craigspencer@modintro.com>
  * Last Modified: 11/09/2018

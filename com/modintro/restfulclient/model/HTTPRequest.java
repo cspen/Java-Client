@@ -16,30 +16,6 @@ import java.net.URL;
 
 public class HTTPRequest {
 	
-	/*
-	public static void main(String[] args) {
-		try {
-			HTTPRequest reader = new HTTPRequest("http://localhost/GEM/rest/employees/");
-			String data = "lname=Reys&fname=Bart";
-			data += "&dept=Accounting&salary=20000&ftime=0&hdate=2018-12-31";
-			
-			String json = "{\"lastname\":\"Brida\", \"firstname\":\"Elmer\"," +
-					"\"department\":\"Sales\", \"fulltime\":\"0\", \"hiredate\":\"2018-09-02\"," +
-					"\"salary\":\"75000\" }";
-			// String str = reader.putData(70, json, "7647966b7343c29048673252e", null);
-			// String str = reader.getData(70, "ac627ab1ccbdb62ec96e702f07f6425b", "Sat, 07 Oct 2018 04:26:25 GMT");
-			String str = reader.postData(data);
-			// reader.getData(101, "f4b9ec30ad9f68f89b29639786cb62ef", null);
-			// reader.deleteData(101, "f4b9ec30ad9f68f89b29639786cb62ef", null);
-			
-			System.out.print("END " + str);
-		} catch(Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-	} */
-
-	
 	public HTTPRequest(String url) {
 		this.url = url;
 		responseCode = 0;
@@ -106,11 +82,12 @@ public class HTTPRequest {
 		URLConn.setDoOutput(true);
         URLConn.setRequestMethod("PUT");
         URLConn.setRequestProperty("Content-Type", "application/json");
+        
         if(etag != null)
         	URLConn.setRequestProperty("If-Match", etag);
         if(lastModified != null)
         	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
-    	
+        
         try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
     		wr.write(data.getBytes());
     	}		

@@ -1,5 +1,16 @@
 package com.modintro.restfulclient.model;
 
+/**
+ * Table model for JTable.
+ * 
+ * The addUpdateListener and nofityUpdateListener methods are for
+ * intercepting a table row update and allowing processing of the
+ * input to take place before the change is committed to the table
+ * and the original value is lost.
+ * 
+ * @author Craig Spencer <craigspencer@modintro.com>
+ * Last Modified: 11/09/2018
+ */
 
 import java.util.Vector;
 
@@ -29,10 +40,6 @@ public class TableModel extends AbstractTableModel implements Constants {
 		}
         fireTableStructureChanged();
     }
-	
-	public void setHTTPRequest(HTTPRequest httpReq) {
-		this.httpReq = httpReq;
-	}
 	
 	public int getColumnCount() {
 		return columnIdentifiers.size();
@@ -71,38 +78,7 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 		// Prevent unnecessary updates - conserve bandwidth
 		if(!value.equals(obj)) {
-			if(!value.equals("")) { // Check for empty input
-				
-				// Update server before updating local
-				// TO-DO: make call to server
-				/*
-				String data = "";
-				Integer id = (Integer)getValueAt(row, 0);
-				String fname = (String)getValueAt(row, 1);
-				String lname = (String)getValueAt(row, 2);
-				String dept = (String)getValueAt(row, 3);
-				Boolean ftime = (Boolean)getValueAt(row, 4);
-				String hdate = (String)getValueAt(row, 5);
-				Integer sal = (Integer)getValueAt(row, 6);
-				String etag = (String)getValueAt(row, 4);
-				String lmod = (String)getValueAt(row, 4);
-				
-				data = "{ Employee: { \"lastname\":\"" + lname + "\", " +
-					"\"firstname\":\"" + fname + "\", \"department\":\"" + dept + "\", " +
-					"\"fulltime\":\"" + ftime + "\", \"hiredate\":\"" + hdate + "\", " +
-					"\"salary\":\"" + sal + "\" }";
-				
-				try {
-					httpReq.putData(id, data, etag, lmod);
-				
-					// then make another call to get
-					// new etag and last modified fields
-					rowVector.setElementAt(value, col);
-					fireTableCellUpdated(row, col);
-				} catch (Exception e) {
-					
-				}
-				*/
+			if(!value.equals("")) { // Check for empty input				
 				notifyUpdateListener(value, row, col);
 			} 
 		}
@@ -165,6 +141,5 @@ public class TableModel extends AbstractTableModel implements Constants {
 		
 	private Vector<Vector<Object>> dataList;
 	private Vector<Object> columnIdentifiers;
-	private HTTPRequest httpReq = new HTTPRequest(APP_URL);
 	private UpdateListener updateListener = null;
 }
