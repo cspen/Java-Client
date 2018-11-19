@@ -12,7 +12,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,11 +33,16 @@ public class HelpDialog extends JDialog implements ActionListener {
 		jpane.setEditable(false);
 		jpane.setContentType(CONTENT_TYPE);
 		
-		File helpFile = new File(getClass().getResource(HELP_CONTENT_FILE).getFile());
-		Path path = helpFile.toPath();	
+		InputStream is = getClass().getResourceAsStream(HELP_CONTENT_FILE);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		
 		try {
-			byte[] bArr = Files.readAllBytes(path);
-			jpane.setText(new String(bArr));
+			String allLines = null;
+			String line = null;
+		    while ((line = reader.readLine()) != null) {
+		        allLines += line;
+		    }
+		    jpane.setText(allLines);
 		} catch(Exception ex) {
 			JOptionPane.showMessageDialog(this, 
 					"Help could not be loaded");			
