@@ -7,7 +7,7 @@ package com.modintro.restfulclient.model;
 
 public interface Constants {
 	
-	String APP_URL = "http://localhost/GEM/rest/employees/";
-	String DEPT_URL = "http://localhost/GEM/rest/departments/";
+	String APP_URL = "http://modintro.com/employees/";
+	String DEPT_URL = "http://modintro.com/departments/";
 
 }
