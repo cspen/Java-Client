@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Sealed: true
+Main-Class: com.modintro.restfulclient.gui.Main
+Permissions: sandbox
+Codebase: http://modintro.com/
