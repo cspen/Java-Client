@@ -18,6 +18,10 @@ import javax.swing.table.AbstractTableModel;
 
 public class TableModel extends AbstractTableModel implements Constants {
 	
+	public TableModel(int rowCount, Object[] columnNames) {
+		setDataVector(rowCount, columnNames);
+	}
+	
 	public TableModel(Object[][] data, Object[] columnNames) {
         setDataVector(data, columnNames);
     }
@@ -25,6 +29,10 @@ public class TableModel extends AbstractTableModel implements Constants {
 	public void setDataVector(Object[][] dataList, Object[] columnIdentifiers) {
         setDataVector(convertToVector(dataList), convertToVector(columnIdentifiers));
     }
+	
+	public void setDataVector(int rowCount, Object[] columnIdentifiers) {
+		setDataVector(new Vector<Vector<Object>>(rowCount), convertToVector(columnIdentifiers));
+	}
 	
 	public void setDataVector(Vector<Vector<Object>> dataList, Vector<Object> columnIdentifiers) {
 		if(dataList != null) {

@@ -16,7 +16,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.StringReader;
-import java.net.URI;
 import java.text.Format;
 import java.text.NumberFormat;
 
@@ -102,8 +101,9 @@ public class Main implements Constants {
         } catch (Exception e) {
         	// System.out.println(e.getMessage());
         	String msg = "\nClosing Application";
-        	JOptionPane.showMessageDialog(frame, e.getMessage() + msg,
+        	JOptionPane.showMessageDialog(frame,  e.toString() + " " + msg,
         			"Error", JOptionPane.ERROR_MESSAGE);
+        	
         	System.exit(0);
         }
         
@@ -147,12 +147,16 @@ public class Main implements Constants {
 	}
 	
 	public static TableModel getTableModel() throws Exception {
-		// URL theService = new URL(APP_URL);
-    	httpReq = new HTTPRequest(APP_URL);
+		httpReq = new HTTPRequest(APP_URL);
     	String data = httpReq.getData();
-    	ServerResponseParser xmlp = new ServerResponseParser(data);
     	
-    	TableModel tm = new TableModel(xmlp.getData(), xmlp.getColumnNames());
+    	TableModel tm;
+    	if(data != null || !data.equals("")) {
+    		ServerResponseParser xmlp = new ServerResponseParser(data);
+    	  	tm = new TableModel(xmlp.getData(), xmlp.getColumnNames());
+    	} else {
+    		tm = new TableModel(10, colNames);
+    	}
     	tm.addTableModelListener(new TableListener());
     	tm.addUpdateListener(new Update());
     	return tm;
