@@ -114,7 +114,7 @@ public class Main implements Constants {
         
 		jTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
 		jTable.setFillsViewportHeight(true);
-		JScrollPane scrollPane = new JScrollPane(jTable);		
+		scrollPane = new JScrollPane(jTable);		
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		// Add dialog boxes
@@ -365,9 +365,13 @@ public class Main implements Constants {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				tmodel = getTableModel();
+				jTable = new JTable();
 				jTable.setModel(tmodel);
-				initTable();
-				
+				initTable();				
+				// Must create new JTable and TableModel
+				// then load them into the JScrollPane
+				// to update view.
+				scrollPane.setViewportView(jTable);
 			} catch(Exception ex) {
 				JOptionPane.showMessageDialog(frame, "Unable to refresh");
 			}
@@ -535,6 +539,7 @@ public class Main implements Constants {
 	}
 	
 	private static JFrame frame = new JFrame("Restful Client Demo");
+	private static JScrollPane scrollPane;
 	private static NewRecordDialog newRecDialog;
 	private static HelpDialog helpDialog;
 	private static JTable jTable;
