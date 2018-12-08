@@ -183,18 +183,18 @@ public class NewRecordDialog extends JDialog
 		String depts = null;
 		try {
 			depts = httpReq.getData();
-			JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
+			JAXBContext jbc = JAXBContext.newInstance(test.jaxb.Departments.class);
 			Unmarshaller u = jbc.createUnmarshaller();
 			
 			Departments d = (Departments)u.unmarshal(new StreamSource(new StringReader(depts)));
-		    ArrayList<String> list = (ArrayList<String>) d.getDepartment();
+			ArrayList<String> list = (ArrayList<String>) d.getDepartment();
 		    int length = list.size();
 		    for(int i = 0; i < length; i++) {
 		    	deptCombo.addItem(list.get(i));
 		    }
 		   			
 		} catch(Exception e) {
-			System.out.println(e.getMessage());			
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}		
 		return deptCombo;
 	}
