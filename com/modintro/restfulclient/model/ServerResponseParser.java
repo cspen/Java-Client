@@ -19,11 +19,12 @@ package com.modintro.restfulclient.model;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -33,7 +34,7 @@ public class ServerResponseParser {
 	public ServerResponseParser() {}
 	
 	public ServerResponseParser(String xml) throws Exception {
-		 parseXML(xml);		
+		parseXML(xml);
 	}
 	
 	private void parseXML(String xml) throws Exception {
@@ -57,16 +58,18 @@ public class ServerResponseParser {
 			nextNode = nextNode.getNextSibling();
 		}
 		
+		
 		// Move column names from list to array
 		int listSize = list.size();
 		columnNames = new String[listSize];
 		for(int i = 0; i < listSize; i++) {
 			columnNames[i] = list.get(i);
 		}
-			
+		
 		// Get data
 		list = new ArrayList<Object>();
 		NodeList nodelist = doc.getElementsByTagName("*");
+		
 		for(int i = 0; i < nodelist.getLength(); i++) {
 			Node currentNode = nodelist.item(i);
 			if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -86,7 +89,7 @@ public class ServerResponseParser {
 						} else {
 							list.add(temp.getNodeValue());
 						}
-					}
+					} 
 				}
 			}
 		}
