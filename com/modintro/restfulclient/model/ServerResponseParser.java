@@ -1,7 +1,7 @@
 package com.modintro.restfulclient.model;
 
 /**
- * This ServerResponseParser is specifically for parser
+ * This ServerResponseParser is specifically for parsing
  * an XML response from the server located at
  * http://modintro.com/employees/
  * 
