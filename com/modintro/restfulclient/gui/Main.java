@@ -177,6 +177,11 @@ public class Main implements Constants {
 				httpReq.putData(id, data, etag, lmod);
 				int code = httpReq.responseCode();
 				if(code == 204) {
+					// I feel like this is bad design because
+					// I'm not making the put operation atomic
+					// Should return the etag and lastModified
+					// with the PUT response header
+
 					// Make another call to get
 					// new etag and last modified fields
 					String newData = httpReq.getData(id, null, null);
@@ -210,7 +215,7 @@ public class Main implements Constants {
 				} else {
 					JOptionPane.showMessageDialog(frame,
 							"The operation could not be completed due to server error.",
-							"Oops!",
+							"Oops! * " + httpReq.responseCode(),
 							JOptionPane.ERROR_MESSAGE);
 					// e.printStackTrace();
 				}
@@ -420,7 +425,7 @@ public class Main implements Constants {
 				try {
 					String aboutMsg = "<html><h3>Java Client Application</h3>"
 							+ "<p>Created by Craig Spencer</p>"
-							+ "<p>November 2018</p>"
+							+ "<p>December 2018</p>"
 							+ "</html>";
 					JOptionPane.showMessageDialog(frame,
 							aboutMsg,
