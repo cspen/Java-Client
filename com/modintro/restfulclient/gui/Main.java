@@ -177,14 +177,17 @@ public class Main implements Constants {
 				httpReq.putData(id, data, etag, lmod);
 				int code = httpReq.responseCode();
 				if(code == 204) {
-					// I feel like this is bad design because
-					// I'm not making the put operation atomic
-					// Should return the etag and lastModified
-					// with the PUT response header
-
-					// Make another call to get
-					// new etag and last modified fields
-					String newData = httpReq.getData(id, null, null);
+					// String newData = httpReq.getData(id, null, null);
+					
+					// ***********************
+					// No longer need to make GET request to get
+					// etag and last modified fields. The PUT
+					// request returns these headers for the updated
+					// entity.
+					
+					// Now need to update table
+					// Probably going to need a new updateRow function
+					String newData = null; // Need to construct new data string
 					updateRow(newData, row);
 				} else {
 					JOptionPane.showMessageDialog(frame,
