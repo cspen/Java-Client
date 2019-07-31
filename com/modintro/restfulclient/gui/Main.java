@@ -288,6 +288,13 @@ public class Main implements Constants {
 			tmodel.updateValueAt(emp.getEtag(), row, 7);
 			tmodel.updateValueAt(newLastMod, row, 8);
 		}
+		
+		private void updateRow() {
+			// Need to update the etag and last modified fields
+			// as well as the actual updated field.
+			// The problem is there are Strings, ints, and boolean
+			// values.
+		}
 	}
 	
 	static class NewAction extends AbstractAction {
