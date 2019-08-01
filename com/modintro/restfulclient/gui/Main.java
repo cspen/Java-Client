@@ -168,7 +168,7 @@ public class Main implements Constants {
 	static class Update implements UpdateListener {
 		public void update(Object value, int row, int col) {
 			// Update server before updating local model
-			String data = createDataString(value, row, col);
+			String data = createJSONString(value, row, col);
 			Integer id = (Integer)tmodel.getValueAt(row, 0);
 			String etag = (String)tmodel.getValueAt(row, 7);
 			String lmod = (String)tmodel.getValueAt(row, 8);
@@ -185,8 +185,6 @@ public class Main implements Constants {
 					// request returns these headers for the updated
 					// entity.
 					
-					// Now need to update table
-					// Probably going to need a new updateRow function
 					String newData = null; // Need to construct new data string
 					updateRow(newData, row);
 				} else {
@@ -205,6 +203,7 @@ public class Main implements Constants {
 							errStr,
 							"Error",
 							JOptionPane.ERROR_MESSAGE);
+					
 					// Get "fresh" data from server
 					try {
 						String newData = httpReq.getData(id, null, null);
@@ -230,7 +229,7 @@ public class Main implements Constants {
 		 * The value of the data at the cell with the specified row
 		 * and column will be replaced by the specified value.
 		 */
-		private String createDataString(Object value, int row, int col) {
+		private String createJSONString(Object value, int row, int col) {
 			String data = "";
 			Integer id = (Integer)tmodel.getValueAt(row, 0);
 			String lname = (String)tmodel.getValueAt(row, 1);
@@ -296,7 +295,13 @@ public class Main implements Constants {
 			// values.
 		}
 		
-		private void updateRow(int newData, int row, int col) {
+		// Only one int column
+		private void updateRow(int newData, int row) {
+			
+		}
+		
+		// Only one boolean column
+		private void updateRow(boolean newData, int row) {
 			
 		}
 	}
