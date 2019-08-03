@@ -42,14 +42,14 @@ public class HTTPRequest {
 
 	public String getData(int id, String etag, String lastModified) throws Exception {
 		URL url = new URL(this.url + id);
-        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
-        URLConn.setRequestMethod("GET");
-        URLConn.setRequestProperty("Accept", "application/xml");
-        if(etag != null)
-        	URLConn.setRequestProperty("If-Match", etag);
-        if(lastModified != null)
-        	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
-        URLConn.connect();
+        	HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+        	URLConn.setRequestMethod("GET");
+        	URLConn.setRequestProperty("Accept", "application/xml");
+        	if(etag != null)
+        		URLConn.setRequestProperty("If-Match", etag);
+        	if(lastModified != null)
+        		URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
+        	URLConn.connect();
 		return urlResponseReader(URLConn);
 	}
 	
@@ -57,23 +57,23 @@ public class HTTPRequest {
 		URL url = new URL(this.url);
 		HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
 		URLConn.setDoOutput(true);
-        URLConn.setRequestMethod("POST");
-        URLConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        	URLConn.setRequestMethod("POST");
+        	URLConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
     	
-        try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
-    		wr.write(data.getBytes());
-    	}        
+        	try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
+    			wr.write(data.getBytes());
+    		}        
 		return urlResponseReader(URLConn);
 	}
 	
 	public void deleteData(int id, String etag, String lastModified) throws Exception {
 		URL url = new URL(this.url + id);
-        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
-        URLConn.setRequestMethod("DELETE");
-        URLConn.setRequestProperty("If-Match", etag);
-       	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
-       	URLConn.connect();
-       	urlResponseReader(URLConn);
+        	HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+        	URLConn.setRequestMethod("DELETE");
+        	URLConn.setRequestProperty("If-Match", etag);
+       		URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
+       		URLConn.connect();
+       		urlResponseReader(URLConn);
 	}
 	
 	public String putData(int id, String data, String etag, String lastModified) throws Exception {
@@ -88,7 +88,7 @@ public class HTTPRequest {
         if(lastModified != null)
         	URLConn.setRequestProperty("If-Unmodified-Since", lastModified);
         
-        try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
+       	try(DataOutputStream wr = new DataOutputStream(URLConn.getOutputStream())) {
     		wr.write(data.getBytes());
     	}		
 		return urlResponseReader(URLConn);
@@ -101,43 +101,43 @@ public class HTTPRequest {
 		} else {
 			url = new URL(this.url);
 		} 
-        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
-        URLConn.setRequestMethod(httpVerb);
-       	URLConn.setRequestProperty("Accept", "application/xml");
+        	HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+       		URLConn.setRequestMethod(httpVerb);
+       		URLConn.setRequestProperty("Accept", "application/xml");
         
-        return urlResponseReader(URLConn);
+        	return urlResponseReader(URLConn);
 	}     
         
     private String urlResponseReader(HttpURLConnection URLConn) throws Exception {
     	this.responseCode = URLConn.getResponseCode();
     	this.responseMessage = URLConn.getResponseMessage();
     	BufferedReader in = new BufferedReader(
-        	new InputStreamReader(URLConn.getInputStream()));
+       		new InputStreamReader(URLConn.getInputStream()));
     	
     	String inputLine;
-        StringBuilder input = new StringBuilder();
-        while ((inputLine = in.readLine()) != null)
-            input.append(inputLine);
-        in.close();
+       	StringBuilder input = new StringBuilder();
+       	while ((inputLine = in.readLine()) != null)
+           		input.append(inputLine);
+       	in.close();
                 
-        return input.toString();
+       	return input.toString();
     }
     
-    public int responseCode() {
-    	return this.responseCode;
-    }
+    	public int responseCode() {
+    		return this.responseCode;
+    	}
     
-    public String responseMessage() {
-    	return this.responseMessage;
-    }
+    	public String responseMessage() {
+    		return this.responseMessage;
+    	}
     
-    public String etag() {
-    	return this.etag();
-    }
+    	public String etag() {
+    		return this.etag;
+    	}
     
-    public String lastModified() {
-    	return this.lastModified;
-    }
+    	public String lastModified() {
+    		return this.lastModified;
+    	}
 	
 	private String url;
 	private int responseCode;
