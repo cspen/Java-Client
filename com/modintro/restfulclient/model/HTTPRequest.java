@@ -101,11 +101,11 @@ public class HTTPRequest {
 		} else {
 			url = new URL(this.url);
 		} 
-        	HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
-       		URLConn.setRequestMethod(httpVerb);
-       		URLConn.setRequestProperty("Accept", "application/xml");
+        HttpURLConnection URLConn = (HttpURLConnection)url.openConnection();
+       	URLConn.setRequestMethod(httpVerb);
+       	URLConn.setRequestProperty("Accept", "application/xml");
         
-        	return urlResponseReader(URLConn);
+        return urlResponseReader(URLConn);
 	}     
         
     private String urlResponseReader(HttpURLConnection URLConn) throws Exception {
@@ -119,6 +119,9 @@ public class HTTPRequest {
        	while ((inputLine = in.readLine()) != null)
            		input.append(inputLine);
        	in.close();
+       	
+       	this.etag = URLConn.getHeaderField("ETag");
+       	this.lastModified = URLConn.getHeaderField("Last-Modified");
                 
        	return input.toString();
     }
