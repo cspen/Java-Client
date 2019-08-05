@@ -177,13 +177,18 @@ public class Main implements Constants {
 				httpReq.putData(id, data, etag, lmod);
 				int code = httpReq.responseCode();
 				if(code == 204) {
-					// String newData = httpReq.getData(id, null, null);
+					// Need to get etag and last modified fields
+					// from the response headers then
+					// create an XML string containing the updated
+					// row data and pass it to the updateRow function
 					
-					// ***********************
-					// No longer need to make GET request to get
-					// etag and last modified fields. The PUT
-					// request returns these headers for the updated
-					// entity.
+					String newEtag = httpReq.etag();
+					String newLmod = httpReq.lastModified();
+					
+					JOptionPane.showMessageDialog(frame,
+							"N: " + newEtag + " O: " + etag,
+							"Test Title",
+							JOptionPane.ERROR_MESSAGE);
 					
 					String newData = null; // Need to construct new data string
 					updateRow(newData, row);
@@ -216,7 +221,8 @@ public class Main implements Constants {
 					}					
 				} else {
 					JOptionPane.showMessageDialog(frame,
-							"The operation could not be completed due to server error.",
+							// "The operation could not be completed due to server error.",
+							"E: " + e.getMessage(),
 							"Oops! * " + httpReq.responseCode(),
 							JOptionPane.ERROR_MESSAGE);
 					// e.printStackTrace();
