@@ -273,7 +273,18 @@ public class Main implements Constants {
 		
 		public String createXMLDataString() {
 			StringBuilder str = new StringBuilder();
-			
+			str.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+			str.append("<Employee>");
+			str.append("<employeeID></employeeID>");
+			str.append("<last_name></last_name>");
+			str.append("<first_name></first_name>");
+			str.append("<department></department>");
+			str.append("<full_tim></full_time>");
+			str.append("<hire_date></hire_date>");
+			str.append("<salary><salary>");
+			str.append("<etag></etag>");
+			str.append("<last_modified></last_modified>");
+			str.append("</Employee>");
 			
 			return str.toString();
 			
