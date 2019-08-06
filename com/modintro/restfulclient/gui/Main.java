@@ -190,7 +190,7 @@ public class Main implements Constants {
 							"Test Title",
 							JOptionPane.ERROR_MESSAGE);
 					
-					String newData = null; // Need to construct new data string
+					String newData = createXMLDateString(newEtag, newLmod); // Need to construct new data string
 					updateRow(newData, row);
 				} else {
 					JOptionPane.showMessageDialog(frame,
@@ -225,7 +225,7 @@ public class Main implements Constants {
 							"E: " + e.getMessage(),
 							"Oops! * " + httpReq.responseCode(),
 							JOptionPane.ERROR_MESSAGE);
-					// e.printStackTrace();
+					e.printStackTrace();
 				}
 			}			
 		}
@@ -271,6 +271,14 @@ public class Main implements Constants {
 			return data;
 		}
 		
+		public String createXMLDataString() {
+			StringBuilder str = new StringBuilder();
+			
+			
+			return str.toString();
+			
+		}
+		
 		// Update a row in the JTable
 		private void updateRow(String newData, int row) throws Exception {
 			JAXBContext jbc = JAXBContext.newInstance("test.jaxb");
@@ -294,6 +302,7 @@ public class Main implements Constants {
 			tmodel.updateValueAt(newLastMod, row, 8);
 		}
 		
+		/*
 		private void updateRow(String newData, int row, int col) {
 			// Need to update the etag and last modified fields
 			// as well as the actual updated field.
@@ -310,6 +319,7 @@ public class Main implements Constants {
 		private void updateRow(boolean newData, int row) {
 			
 		}
+		*/
 	}
 	
 	static class NewAction extends AbstractAction {
