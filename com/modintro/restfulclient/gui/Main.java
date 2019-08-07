@@ -190,7 +190,7 @@ public class Main implements Constants {
 							"Test Title",
 							JOptionPane.ERROR_MESSAGE);
 					
-					String newData = createXMLDataString(newEtag, newLmod); // Need to construct new data string
+					String newData = createXMLDataString(newEtag, newLmod, row); // Need to construct new data string
 					updateRow(newData, row);
 				} else {
 					JOptionPane.showMessageDialog(frame,
@@ -271,17 +271,18 @@ public class Main implements Constants {
 			return data;
 		}
 		
-		public String createXMLDataString(String etag, String lmod) {
+		public String createXMLDataString(String etag, String lmod, int row) {
 			StringBuilder str = new StringBuilder();
+			System.out.println();
 			str.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 			str.append("<Employee>");
-			str.append("<employeeID>" + (Integer)tmodel.getValueAt(row, 0) + "</employeeID>");
-			str.append("<last_name></last_name>");
-			str.append("<first_name></first_name>");
-			str.append("<department></department>");
-			str.append("<full_tim></full_time>");
-			str.append("<hire_date></hire_date>");
-			str.append("<salary><salary>");
+			str.append("<employeeID>" + (Integer)jTable.getValueAt(row, 0) + "</employeeID>");
+			str.append("<last_name>" + (String)jTable.getValueAt(row, 1) + "</last_name>");
+			str.append("<first_name>" + (String)jTable.getValueAt(row, 2) + "</first_name>");
+			str.append("<department>" + (String)jTable.getValueAt(row, 3) + "</department>");
+			str.append("<full_time>" + (Boolean)jTable.getValueAt(row, 4) + "</full_time>");
+			str.append("<hire_date>" + (String)jTable.getValueAt(row, 5) + "</hire_date>");
+			str.append("<salary>" + (Integer)jTable.getValueAt(row, 6) + "</salary>");
 			str.append("<etag>" + etag + "</etag>");
 			str.append("<last_modified>" + lmod + "</last_modified>");
 			str.append("</Employee>");
