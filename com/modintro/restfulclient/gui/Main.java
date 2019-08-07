@@ -190,7 +190,7 @@ public class Main implements Constants {
 							"Test Title",
 							JOptionPane.ERROR_MESSAGE);
 					
-					String newData = createXMLDateString(newEtag, newLmod); // Need to construct new data string
+					String newData = createXMLDataString(newEtag, newLmod); // Need to construct new data string
 					updateRow(newData, row);
 				} else {
 					JOptionPane.showMessageDialog(frame,
@@ -271,19 +271,19 @@ public class Main implements Constants {
 			return data;
 		}
 		
-		public String createXMLDataString() {
+		public String createXMLDataString(String etag, String lmod) {
 			StringBuilder str = new StringBuilder();
 			str.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 			str.append("<Employee>");
-			str.append("<employeeID></employeeID>");
+			str.append("<employeeID>" + (Integer)tmodel.getValueAt(row, 0) + "</employeeID>");
 			str.append("<last_name></last_name>");
 			str.append("<first_name></first_name>");
 			str.append("<department></department>");
 			str.append("<full_tim></full_time>");
 			str.append("<hire_date></hire_date>");
 			str.append("<salary><salary>");
-			str.append("<etag></etag>");
-			str.append("<last_modified></last_modified>");
+			str.append("<etag>" + etag + "</etag>");
+			str.append("<last_modified>" + lmod + "</last_modified>");
 			str.append("</Employee>");
 			
 			return str.toString();
