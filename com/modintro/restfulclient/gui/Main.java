@@ -273,7 +273,7 @@ public class Main implements Constants {
 		
 		public String createXMLDataString(String etag, String lmod, int row) {
 			StringBuilder str = new StringBuilder();
-			System.out.println();
+			System.out.println("Jj: " + (String)jTable.getValueAt(row, 1));
 			str.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 			str.append("<Employee>");
 			str.append("<employeeID>" + (Integer)jTable.getValueAt(row, 0) + "</employeeID>");
@@ -314,14 +314,12 @@ public class Main implements Constants {
 			tmodel.updateValueAt(newLastMod, row, 8);
 		}
 		
-		/*
-		private void updateRow(String newData, int row, int col) {
-			// Need to update the etag and last modified fields
-			// as well as the actual updated field.
-			// The problem is there are Strings, ints, and boolean
-			// values.
+		private void updateRow(Object newValue, String etag, String lmod, 
+				int row, int col) {
+			
 		}
 		
+		/*
 		// Only one int column
 		private void updateRow(int newData, int row) {
 			
