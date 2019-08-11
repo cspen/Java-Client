@@ -325,8 +325,8 @@ public class Main implements Constants {
 				
 			}
 			
-			tmodel.updateValueAt(etag, row, 7);
-			tmodel.updateValueAt(lmod, row, 8);
+			tmodel.updateValueAt(etag, row, Constants.ETAG_COL);
+			tmodel.updateValueAt(lmod, row, Constants.LAST_MOD_COL);
 		}
 		
 		/*
@@ -386,9 +386,9 @@ public class Main implements Constants {
 				try {
 					// Get data from table
 					// Need EmployeeID, etag, and lastModified
-					Integer id = (Integer)tmodel.getValueAt(row, 0);
-					String etag = (String)tmodel.getValueAt(row, 7);
-					String lastMod = (String)tmodel.getValueAt(row, 8);
+					Integer id = (Integer)tmodel.getValueAt(row, Constants.ID_COL);
+					String etag = (String)tmodel.getValueAt(row, Constants.ETAG_COL);
+					String lastMod = (String)tmodel.getValueAt(row, Constants.LAST_MOD_COL);
 					
 					// Send request to server
 					httpReq.deleteData(id, etag, lastMod);
