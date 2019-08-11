@@ -303,20 +303,30 @@ public class Main implements Constants {
 			Object newLastMod = emp.getLastModified();
 			
 			// Update the table row
-			tmodel.updateValueAt(emp.getEmployeeID(), row, 0);
-			tmodel.updateValueAt(emp.getLastName(), row, 1);
-			tmodel.updateValueAt(emp.getFirstName(), row, 2);
-			tmodel.updateValueAt(emp.getDepartment(), row, 3);
-			tmodel.updateValueAt(emp.isFullTime(), row, 4);
-			tmodel.updateValueAt(emp.getHireDate(), row, 5);
-			tmodel.updateValueAt(emp.getSalary(), row, 6);
-			tmodel.updateValueAt(emp.getEtag(), row, 7);
-			tmodel.updateValueAt(newLastMod, row, 8);
+			tmodel.updateValueAt(emp.getEmployeeID(), row, Constants.ID_COL);
+			tmodel.updateValueAt(emp.getLastName(), row, Constants.FIRST_NAME_COL);
+			tmodel.updateValueAt(emp.getFirstName(), row, Constants.LAST_NAME_COL);
+			tmodel.updateValueAt(emp.getDepartment(), row, Constants.DEPARTMENT_COL);
+			tmodel.updateValueAt(emp.isFullTime(), row, Constants.FULL_TIME_COL);
+			tmodel.updateValueAt(emp.getHireDate(), row, Constants.HIRE_DATE_COL);
+			tmodel.updateValueAt(emp.getSalary(), row, Constants.SALARY_COL);
+			tmodel.updateValueAt(emp.getEtag(), row, Constants.ETAG_COL);
+			tmodel.updateValueAt(newLastMod, row, Constants.LAST_MOD_COL);
 		}
 		
 		private void updateRow(Object newValue, String etag, String lmod, 
 				int row, int col) {
 			
+			if(col == 6) { // Salary
+				tmodel.updateValueAt((Integer)newValue, row, 6);
+			} else if(newValue instanceof Boolean) {
+				
+			} else if(newValue instanceof String) {
+				
+			}
+			
+			tmodel.updateValueAt(etag, row, 7);
+			tmodel.updateValueAt(lmod, row, 8);
 		}
 		
 		/*
