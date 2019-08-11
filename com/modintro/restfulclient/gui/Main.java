@@ -169,9 +169,9 @@ public class Main implements Constants {
 		public void update(Object value, int row, int col) {
 			// Update server before updating local model
 			String data = createJSONString(value, row, col);
-			Integer id = (Integer)tmodel.getValueAt(row, 0);
-			String etag = (String)tmodel.getValueAt(row, 7);
-			String lmod = (String)tmodel.getValueAt(row, 8);
+			Integer id = (Integer)tmodel.getValueAt(row, Constants.ID_COL);
+			String etag = (String)tmodel.getValueAt(row, Constants.ETAG_COL);
+			String lmod = (String)tmodel.getValueAt(row, Constants.LAST_MOD_COL);
 			
 			try {
 				httpReq.putData(id, data, etag, lmod);
@@ -237,17 +237,17 @@ public class Main implements Constants {
 		 */
 		private String createJSONString(Object value, int row, int col) {
 			String data = "";
-			Integer id = (Integer)tmodel.getValueAt(row, 0);
-			String lname = (String)tmodel.getValueAt(row, 1);
-			String fname = (String)tmodel.getValueAt(row, 2);
-			String dept = (String)tmodel.getValueAt(row, 3);
+			Integer id = (Integer)tmodel.getValueAt(row, Constants.ID_COL);
+			String lname = (String)tmodel.getValueAt(row, Constants.LAST_NAME_COL);
+			String fname = (String)tmodel.getValueAt(row, Constants.FIRST_NAME_COL);
+			String dept = (String)tmodel.getValueAt(row, Constants.DEPARTMENT_COL);
 			
 			String ftime = "0";
-			if(((Boolean)tmodel.getValueAt(row, 4)).booleanValue()) {
+			if(((Boolean)tmodel.getValueAt(row, Constants.FULL_TIME_COL)).booleanValue()) {
 				ftime = "1";
 			};
-			String hdate = (String)tmodel.getValueAt(row, 5);
-			Integer sal = (Integer)tmodel.getValueAt(row, 6);
+			String hdate = (String)tmodel.getValueAt(row, Constants.HIRE_DATE_COL);
+			Integer sal = (Integer)tmodel.getValueAt(row, Constants.SALARY_COL);
 			
 			// Update edited column
 			switch(col) {
@@ -276,19 +276,18 @@ public class Main implements Constants {
 			System.out.println("Jj: " + (String)jTable.getValueAt(row, 1));
 			str.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 			str.append("<Employee>");
-			str.append("<employeeID>" + (Integer)jTable.getValueAt(row, 0) + "</employeeID>");
-			str.append("<last_name>" + (String)jTable.getValueAt(row, 1) + "</last_name>");
-			str.append("<first_name>" + (String)jTable.getValueAt(row, 2) + "</first_name>");
-			str.append("<department>" + (String)jTable.getValueAt(row, 3) + "</department>");
-			str.append("<full_time>" + (Boolean)jTable.getValueAt(row, 4) + "</full_time>");
-			str.append("<hire_date>" + (String)jTable.getValueAt(row, 5) + "</hire_date>");
-			str.append("<salary>" + (Integer)jTable.getValueAt(row, 6) + "</salary>");
+			str.append("<employeeID>" + (Integer)jTable.getValueAt(row, Constants.ID_COL) + "</employeeID>");
+			str.append("<last_name>" + (String)jTable.getValueAt(row, Constants.LAST_NAME_COL) + "</last_name>");
+			str.append("<first_name>" + (String)jTable.getValueAt(row, Constants.FIRST_NAME_COL) + "</first_name>");
+			str.append("<department>" + (String)jTable.getValueAt(row, Constants.DEPARTMENT_COL) + "</department>");
+			str.append("<full_time>" + (Boolean)jTable.getValueAt(row, Constants.FULL_TIME_COL) + "</full_time>");
+			str.append("<hire_date>" + (String)jTable.getValueAt(row, Constants.HIRE_DATE_COL) + "</hire_date>");
+			str.append("<salary>" + (Integer)jTable.getValueAt(row, Constants.SALARY_COL) + "</salary>");
 			str.append("<etag>" + etag + "</etag>");
 			str.append("<last_modified>" + lmod + "</last_modified>");
 			str.append("</Employee>");
 			
 			return str.toString();
-			
 		}
 		
 		// Update a row in the JTable
@@ -318,7 +317,7 @@ public class Main implements Constants {
 				int row, int col) {
 			
 			if(col == 6) { // Salary
-				tmodel.updateValueAt((Integer)newValue, row, 6);
+				tmodel.updateValueAt((Integer)newValue, row, Constants.SALARY_COL);
 			} else if(newValue instanceof Boolean) {
 				
 			} else if(newValue instanceof String) {
