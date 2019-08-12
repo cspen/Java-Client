@@ -185,13 +185,13 @@ public class Main implements Constants {
 					String newEtag = httpReq.etag();
 					String newLmod = httpReq.lastModified();
 					
-					JOptionPane.showMessageDialog(frame,
+					/** JOptionPane.showMessageDialog(frame,
 							"N: " + newEtag + " O: " + etag,
 							"Test Title",
-							JOptionPane.ERROR_MESSAGE);
+							JOptionPane.ERROR_MESSAGE); **/
 					
-					String newData = createXMLDataString(newEtag, newLmod, row); // Need to construct new data string
-					updateRow(newData, row);
+					// String newData = createXMLDataString(newEtag, newLmod, row); // Need to construct new data string
+					updateRow(value, newEtag, newLmod, row, col);
 				} else {
 					JOptionPane.showMessageDialog(frame,
 							"Message",
@@ -303,8 +303,8 @@ public class Main implements Constants {
 			
 			// Update the table row
 			tmodel.updateValueAt(emp.getEmployeeID(), row, Constants.ID_COL);
-			tmodel.updateValueAt(emp.getLastName(), row, Constants.FIRST_NAME_COL);
-			tmodel.updateValueAt(emp.getFirstName(), row, Constants.LAST_NAME_COL);
+			tmodel.updateValueAt(emp.getLastName(), row, Constants.LAST_NAME_COL);
+			tmodel.updateValueAt(emp.getFirstName(), row, Constants.FIRST_NAME_COL);
 			tmodel.updateValueAt(emp.getDepartment(), row, Constants.DEPARTMENT_COL);
 			tmodel.updateValueAt(emp.isFullTime(), row, Constants.FULL_TIME_COL);
 			tmodel.updateValueAt(emp.getHireDate(), row, Constants.HIRE_DATE_COL);
@@ -316,12 +316,12 @@ public class Main implements Constants {
 		private void updateRow(Object newValue, String etag, String lmod, 
 				int row, int col) {
 			
-			if(col == 6) { // Salary
-				tmodel.updateValueAt((Integer)newValue, row, Constants.SALARY_COL);
-			} else if(newValue instanceof Boolean) {
-				
-			} else if(newValue instanceof String) {
-				
+			if(col == Constants.SALARY_COL) { // Salary
+				tmodel.updateValueAt((Integer)newValue, row, col);
+			} else if(col == Constants.FULL_TIME_COL) {
+				tmodel.updateValueAt((Boolean)newValue, row, col);
+			} else {
+				tmodel.updateValueAt((String)newValue, row, col);
 			}
 			
 			tmodel.updateValueAt(etag, row, Constants.ETAG_COL);
